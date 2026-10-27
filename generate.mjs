@@ -247,6 +247,7 @@ if (status !== 'off') {
       const t = results[index] || {};
       outCards.push({
         id: createHash('sha1').update(item.link).digest('hex').slice(0, 10), // names the media files
+        is_new: true, // only new articles get translated and rendered
         region: regionKey,
         category: item.category,
         source: item.source,

@@ -162,7 +162,7 @@ const log = [];
 const browser = await chromium.launch();
 try {
   for (const card of news.cards || []) {
-    if (!card.save_allowed || !card.instagram || !card.id) continue;
+    if (!card.save_allowed || !card.instagram || !card.id || !card.is_new) continue; // new articles only
     try {
       const r = await renderPiece(browser, { template: 'render/article.html', data: { card, logo, photo }, name: card.id, outDir: MEDIA_DIR });
       card.media = {
