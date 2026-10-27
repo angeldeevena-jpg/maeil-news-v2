@@ -1,0 +1,36 @@
+name: Maeil News daily
+
+on:
+  schedule:
+    - cron: '17 1 * * *'   # about 06:47 India time, every day
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Collect news and translate
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+        run: node generate.mjs
+
+      - name: Save the changes
+        run: |
+          git config user.name "maeil-news-bot"
+          git config user.email "maeil-news-bot@users.noreply.github.com"
+          git add docs state
+          if git diff --cached --quiet; then
+            echo "Nothing new"
+          else
+            git commit -m "Daily news update $(date -u +%F)"
+            git push
+          fi

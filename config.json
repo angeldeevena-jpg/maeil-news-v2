@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "monthly_cap_usd": 5.0,
+  "price_per_million_tokens": {
+    "input": 0.15,
+    "output": 0.6
+  }
+}
