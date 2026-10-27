@@ -6,14 +6,16 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.view.View
 import android.widget.RemoteViews
+import java.util.Locale
 import java.util.concurrent.Executors
 
 /**
- * Home-screen widget: one article at a time. It shows the English and Korean headline,
- * the word translations of the Korean title, previous and next, a "Read" button that opens the
- * summary popup, a refresh button, and save buttons for Korean articles and the weekly quiz.
+ * Home-screen widget, as on the design board "widget home" (390 x 450).
+ * One article at a time for the chosen region (KR, IN or World): the headline in both
+ * languages, two audio buttons, previous and next, the word bank, and the weekly quiz download.
  */
 class NewsWidgetProvider : AppWidgetProvider() {
 
@@ -27,9 +29,15 @@ class NewsWidgetProvider : AppWidgetProvider() {
         when (intent.action) {
             ACTION_NEXT -> { step(context, +1); refreshAll(context) }
             ACTION_PREV -> { step(context, -1); refreshAll(context) }
+            ACTION_REGION -> {
+                setRegion(context, intent.getStringExtra(EXTRA_REGION) ?: REGIONS[0])
+                refreshAll(context)
+            }
             ACTION_REFRESH -> fetchInBackground(context)
             ACTION_SAVE -> saveCurrentArticle(context)
             ACTION_SAVE_QUIZ -> saveQuiz(context)
+            ACTION_SPEAK_EN -> currentCard(context)?.let { Speaker.speak(context, it.englishTitle, Locale.US, 1.0f) }
+            ACTION_SPEAK_KO -> currentCard(context)?.let { Speaker.speak(context, it.koreanTitle, Locale.KOREAN, 0.7f) }
         }
     }
 
@@ -83,28 +91,56 @@ class NewsWidgetProvider : AppWidgetProvider() {
 
     companion object {
         const val PREFS = "widget"
-        const val KEY_INDEX = "index"
+        const val KEY_REGION = "region"
+        const val EXTRA_REGION = "region"
+        val REGIONS = listOf("korean", "indian", "global")
+
         const val ACTION_PREV = "com.maeilnews.app.PREV"
         const val ACTION_NEXT = "com.maeilnews.app.NEXT"
         const val ACTION_REFRESH = "com.maeilnews.app.REFRESH"
         const val ACTION_SAVE = "com.maeilnews.app.SAVE"
         const val ACTION_SAVE_QUIZ = "com.maeilnews.app.SAVE_QUIZ"
+        const val ACTION_REGION = "com.maeilnews.app.REGION"
+        const val ACTION_SPEAK_EN = "com.maeilnews.app.SPEAK_EN"
+        const val ACTION_SPEAK_KO = "com.maeilnews.app.SPEAK_KO"
 
         private val executor = Executors.newSingleThreadExecutor()
+        private const val FLAGS = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
-        fun currentIndex(context: Context): Int =
-            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_INDEX, 0)
+        private fun prefs(context: Context) =
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
-        fun currentCard(context: Context): Card? {
-            val cards = NewsStore.loadNews(context)?.cards ?: return null
-            return cards.getOrNull(currentIndex(context))
+        fun currentRegion(context: Context): String =
+            prefs(context).getString(KEY_REGION, REGIONS[0]) ?: REGIONS[0]
+
+        private fun setRegion(context: Context, region: String) {
+            prefs(context).edit().putString(KEY_REGION, region).apply()
         }
 
+        private fun indexKey(region: String) = "index_$region"
+
+        fun currentIndex(context: Context): Int =
+            prefs(context).getInt(indexKey(currentRegion(context)), 0)
+
+        /** The articles of the region chosen in the widget, in the order they were collected. */
+        fun regionCards(context: Context): List<Card> {
+            val region = currentRegion(context)
+            return NewsStore.loadNews(context)?.cards?.filter { it.region == region } ?: emptyList()
+        }
+
+        fun currentCard(context: Context): Card? {
+            val cards = regionCards(context)
+            if (cards.isEmpty()) return null
+            return cards[wrap(currentIndex(context), cards.size)]
+        }
+
+        private fun wrap(index: Int, size: Int): Int = ((index % size) + size) % size
+
         private fun step(context: Context, direction: Int) {
-            val count = NewsStore.loadNews(context)?.cards?.size ?: return
+            val count = regionCards(context).size
             if (count == 0) return
-            val next = ((currentIndex(context) + direction) % count + count) % count
-            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putInt(KEY_INDEX, next).apply()
+            val next = wrap(currentIndex(context) + direction, count)
+            prefs(context).edit().putInt(indexKey(currentRegion(context)), next).apply()
         }
 
         fun refreshAll(context: Context) {
@@ -115,53 +151,86 @@ class NewsWidgetProvider : AppWidgetProvider() {
 
         fun render(context: Context, manager: AppWidgetManager, widgetId: Int) {
             val views = RemoteViews(context.packageName, R.layout.widget_news)
+            val region = currentRegion(context)
+            val news = NewsStore.loadNews(context)
+            val cards = regionCards(context)
             val card = currentCard(context)
 
+            views.setTextViewText(R.id.date, dateLabel(news?.date))
+
+            regionChip(context, views, R.id.chip_korean, "korean", "KR", region)
+            regionChip(context, views, R.id.chip_indian, "indian", "IN", region)
+            regionChip(context, views, R.id.chip_global, "global", "World", region)
+
             if (card != null) {
-                views.setTextViewText(R.id.category, "${card.category} · ${regionLabel(card.region)}")
+                val position = wrap(currentIndex(context), cards.size) + 1
+                views.setTextViewText(R.id.category, "${card.category} · $position / ${cards.size}")
                 views.setTextViewText(R.id.headline, card.englishTitle)
                 views.setTextViewText(R.id.headline_kr, card.koreanTitle)
-                views.setTextViewText(
-                    R.id.word_bank,
-                    card.titleWords.joinToString("   ") { "${it.ko} ${it.en}" }
-                )
                 views.setViewVisibility(R.id.save, if (card.saveAllowed) View.VISIBLE else View.GONE)
+                views.setOnClickPendingIntent(R.id.card, activity(context, DetailActivity::class.java, card.id))
+                views.setOnClickPendingIntent(R.id.word_bank, activity(context, WordBankActivity::class.java, card.id))
             } else {
                 views.setTextViewText(R.id.category, "Maeil News")
-                views.setTextViewText(R.id.headline, "Tap ⟳ to load today's news")
+                views.setTextViewText(R.id.headline, "Tap Maeil News above to load today's news")
                 views.setTextViewText(R.id.headline_kr, "")
-                views.setTextViewText(R.id.word_bank, "")
                 views.setViewVisibility(R.id.save, View.GONE)
+                views.setOnClickPendingIntent(R.id.card, broadcast(context, ACTION_REFRESH))
+                views.setOnClickPendingIntent(R.id.word_bank, broadcast(context, ACTION_REFRESH))
             }
 
+            views.setOnClickPendingIntent(R.id.header_left, broadcast(context, ACTION_REFRESH))
             views.setOnClickPendingIntent(R.id.prev, broadcast(context, ACTION_PREV))
             views.setOnClickPendingIntent(R.id.next, broadcast(context, ACTION_NEXT))
-            views.setOnClickPendingIntent(R.id.refresh, broadcast(context, ACTION_REFRESH))
             views.setOnClickPendingIntent(R.id.save, broadcast(context, ACTION_SAVE))
             views.setOnClickPendingIntent(R.id.save_quiz, broadcast(context, ACTION_SAVE_QUIZ))
-            views.setOnClickPendingIntent(R.id.details, activity(context, DetailActivity::class.java))
+            views.setOnClickPendingIntent(R.id.audio_en, broadcast(context, ACTION_SPEAK_EN))
+            views.setOnClickPendingIntent(R.id.audio_kr, broadcast(context, ACTION_SPEAK_KO))
 
             manager.updateAppWidget(widgetId, views)
         }
 
-        private fun broadcast(context: Context, action: String): PendingIntent {
-            val intent = Intent(context, NewsWidgetProvider::class.java).setAction(action)
-            return PendingIntent.getBroadcast(
-                context,
-                action.hashCode(),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+        /** A region chip: yellow with dark text when chosen, plain cream text otherwise. */
+        private fun regionChip(
+            context: Context,
+            views: RemoteViews,
+            viewId: Int,
+            key: String,
+            label: String,
+            selected: String
+        ) {
+            val chosen = key == selected
+            views.setTextViewText(viewId, label)
+            views.setInt(viewId, "setBackgroundResource", if (chosen) R.drawable.pill_yellow else 0)
+            views.setTextColor(viewId, if (chosen) Color.parseColor("#FF1F1A17") else Color.parseColor("#FFFFF8EE"))
+            views.setOnClickPendingIntent(viewId, broadcast(context, ACTION_REGION, EXTRA_REGION, key))
         }
 
-        private fun activity(context: Context, target: Class<*>): PendingIntent {
-            val intent = Intent(context, target).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            return PendingIntent.getActivity(
-                context,
-                target.name.hashCode(),
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+        /** "2026-10-27" becomes "매일 뉴스 · 10월 27일". */
+        private fun dateLabel(date: String?): String {
+            val parts = date?.split("-") ?: return "매일 뉴스"
+            if (parts.size != 3) return "매일 뉴스"
+            val month = parts[1].toIntOrNull() ?: return "매일 뉴스"
+            val day = parts[2].toIntOrNull() ?: return "매일 뉴스"
+            return "매일 뉴스 · ${month}월 ${day}일"
+        }
+
+        private fun broadcast(
+            context: Context,
+            action: String,
+            extraKey: String? = null,
+            extraValue: String? = null
+        ): PendingIntent {
+            val intent = Intent(context, NewsWidgetProvider::class.java).setAction(action)
+            if (extraKey != null) intent.putExtra(extraKey, extraValue)
+            return PendingIntent.getBroadcast(context, (action + extraValue).hashCode(), intent, FLAGS)
+        }
+
+        private fun activity(context: Context, target: Class<*>, cardId: String): PendingIntent {
+            val intent = Intent(context, target)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(DetailActivity.EXTRA_ID, cardId)
+            return PendingIntent.getActivity(context, (target.name + cardId).hashCode(), intent, FLAGS)
         }
     }
 }

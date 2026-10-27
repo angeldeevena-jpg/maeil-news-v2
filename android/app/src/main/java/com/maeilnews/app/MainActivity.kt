@@ -49,19 +49,19 @@ class MainActivity : Activity() {
         }
         column.addView(line("Date: ${news.date}   ${news.note}", 12f))
 
-        news.cards.forEachIndexed { index, card ->
+        news.cards.forEach { card ->
             column.addView(line("${card.category} · ${regionLabel(card.region)}", 12f, bold = true))
             column.addView(TextView(this).apply {
                 text = card.englishTitle
                 textSize = 16f
                 setTypeface(null, Typeface.BOLD)
                 setPadding(0, dp(2), 0, dp(2))
-                setOnClickListener { read(index) }
+                setOnClickListener { read(card.id) }
             })
             column.addView(line(card.koreanTitle, 14f))
             column.addView(Button(this).apply {
                 text = "Read"
-                setOnClickListener { read(index) }
+                setOnClickListener { read(card.id) }
             })
             if (card.saveAllowed) {
                 column.addView(Button(this).apply {
@@ -105,8 +105,8 @@ class MainActivity : Activity() {
         }.start()
     }
 
-    private fun read(index: Int) {
-        startActivity(Intent(this, DetailActivity::class.java).putExtra(DetailActivity.EXTRA_INDEX, index))
+    private fun read(cardId: String) {
+        startActivity(Intent(this, DetailActivity::class.java).putExtra(DetailActivity.EXTRA_ID, cardId))
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
