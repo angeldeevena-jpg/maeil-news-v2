@@ -21,10 +21,6 @@
             android:name=".DetailActivity"
             android:exported="false" />
 
-        <activity
-            android:name=".WordBankActivity"
-            android:exported="false" />
-
         <receiver
             android:name=".NewsWidgetProvider"
             android:exported="false">
@@ -38,6 +34,8 @@
                 <action android:name="com.maeilnews.app.REGION" />
                 <action android:name="com.maeilnews.app.SPEAK_EN" />
                 <action android:name="com.maeilnews.app.SPEAK_KO" />
+                <action android:name="com.maeilnews.app.SPEAK_WORD" />
+                <action android:name="com.maeilnews.app.WORD_BANK" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
