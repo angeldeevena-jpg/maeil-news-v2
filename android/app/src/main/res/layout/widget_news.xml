@@ -181,7 +181,8 @@
             android:textSize="17sp"
             android:textStyle="bold" />
 
-        <View
+        <!-- Empty spacer; plain View is not allowed inside home-screen widgets, FrameLayout is -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
