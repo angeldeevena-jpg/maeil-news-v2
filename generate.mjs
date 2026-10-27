@@ -33,8 +33,7 @@ const REGIONS = {
       { source: 'The Hindu', category: 'Business & Economy', quota: 2, url: 'https://www.thehindu.com/business/feeder/default.rss' },
       { source: 'The Hindu', category: 'Culture', quota: 2, url: 'https://www.thehindu.com/life-and-style/feeder/default.rss' },
       { source: 'The Hindu', category: 'Sports', quota: 2, url: 'https://www.thehindu.com/sport/feeder/default.rss' },
-      { source: 'The Hindu', category: 'Entertainment', quota: 2, url: 'https://www.thehindu.com/entertainment/feeder/default.rss' },
-      { source: 'The Hindu International', category: 'World', quota: 2, url: 'https://www.thehindu.com/news/international/feeder/default.rss' }
+      { source: 'The Hindu', category: 'Entertainment', quota: 2, url: 'https://www.thehindu.com/entertainment/feeder/default.rss' }
     ]
   },
   global: {
