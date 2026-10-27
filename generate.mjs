@@ -133,18 +133,30 @@ for (const link of Object.keys(seen)) if (seen[link] < cutoff) delete seen[link]
 const apiKey = process.env.AI_API_KEY || '';
 const price = config.price_per_million_tokens;
 
-const SYSTEM = `You write for a Korean-learning news app. For each numbered news item (English headline and article text), return JSON:
+const SYSTEM = `You write for a Korean-learning news app. For each numbered news item (English headline, article text, and needs_instagram), return JSON:
 {"cards":[{
   "index": number,
   "korean_title": "natural Korean headline, under 30 characters",
-  "korean_title_words": [{"ko": "Korean word as it appears in korean_title", "en": "short English meaning"}],
+  "title_words": [{"ko": "word as it appears in korean_title", "roman": "romanization", "en": "short English meaning"}],
   "summary": [
-    {"en": "one English sentence from the article, 5 sentences in total in story order",
+    {"en": "one English sentence from the article, exactly 5 in story order",
      "ko": "natural Korean translation of that sentence, polite style (-요/-습니다)",
-     "words": [{"ko": "each Korean word in the ko sentence, as it appears (particles attached are fine)", "en": "short English meaning"}]}
-  ]
+     "words": [{"ko": "each word in the ko sentence as written (particles attached are fine)", "en": "short English meaning"}]}
+  ],
+  "instagram": null, or when needs_instagram is true:
+    {"hook_en": "a question about the story that the slides answer. Do not write a teaser the post does not answer",
+     "hook_ko": "the same question in natural Korean",
+     "hook_words": [{"ko": "word", "en": "meaning", "note": "short grammar note in English, e.g. (subject), or empty"}],
+     "slides": [
+       {"label_en": "What happened", "label_ko": "무슨 일", "en": [the English sentences from summary items 1-2], "ko": [their Korean], "words": [{"ko": "word", "en": "meaning", "note": "grammar note or empty"}]},
+       {"label_en": "Why", "label_ko": "이유", "en": [summary item 3], "ko": [its Korean], "words": [...]},
+       {"label_en": "What next", "label_ko": "앞으로", "en": [summary items 4-5], "ko": [their Korean], "words": [...]}
+     ],
+     "other_words": [up to 6 {"ko": "word", "roman": "romanization", "en": "meaning"}, words not already used in the slides],
+     "counterpoint_en": "one sentence giving a different view, only if the article itself gives one, otherwise empty",
+     "counterpoint_ko": "Korean of the counterpoint, or empty"}
 }]}
-Rules: exactly 5 summary items. Facts must match the article; do not add facts. If the article text is missing, write the 5 sentences from the headline and say so in nothing else. Return only JSON.`;
+Rules: exactly 5 summary items. Facts must match the article; do not add facts. Use only what is in the article text; if the text is missing, use the headline and keep to what it states. Return only JSON.`;
 
 async function translateBatch(items) {
   const body = {
@@ -155,7 +167,8 @@ async function translateBatch(items) {
       { role: 'user', content: JSON.stringify(items.map((it, index) => ({
           index,
           headline: it.title,
-          article: it.text || it.description
+          article: it.text || it.description,
+          needs_instagram: !!it.needs_instagram
         }))) }
     ]
   };
@@ -216,6 +229,7 @@ if (status !== 'off') {
 
     const results = [];
     if (status === 'ai') {
+      for (const item of picked) item.needs_instagram = regionKey === 'korean';
       for (let i = 0; i < picked.length; i += AI_BATCH) {
         const chunk = picked.slice(i, i + AI_BATCH);
         try {
@@ -238,9 +252,11 @@ if (status !== 'off') {
         published: item.published,
         english_title: item.title,
         korean_title: t.korean_title || '',
-        korean_title_words: t.korean_title_words || [],
+        title_words: t.title_words || [],
         summary: t.summary || [],
-        save_allowed: regionKey === 'korean' // save cards, Instagram post and video: Korean articles only
+        // Instagram slides, save cards and video: Korean articles only
+        instagram: regionKey === 'korean' ? (t.instagram || null) : null,
+        save_allowed: regionKey === 'korean'
       });
       seen[item.link] = Date.now();
     });
