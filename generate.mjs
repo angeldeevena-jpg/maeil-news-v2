@@ -106,6 +106,15 @@ async function fetchArticleText(url) {
   }
 }
 
+// ISO week number (1 to 53), used to clean up every other week.
+function isoWeek(d) {
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.ceil(((t - yearStart) / 86400000 + 1) / 7);
+}
+
 // ---------- state and budget ----------
 
 async function readJson(path, fallback) {
@@ -258,6 +267,22 @@ await writeFile(newsPath, JSON.stringify({
   note: finalNote,
   cards
 }, null, 2) + '\n');
+
+// Keep today's articles for the weekly quiz.
+await mkdir('docs/archive', { recursive: true });
+await writeFile(`docs/archive/${today}.json`, JSON.stringify({ date: today, cards: outCards }, null, 2) + '\n');
+
+// Every other Sunday, delete saved days older than 14 days.
+if (now.getUTCDay() === 0 && isoWeek(now) % 2 === 0) {
+  const { readdir, rm } = await import('node:fs/promises');
+  const limit = Date.now() - 14 * 86400000;
+  for (const f of await readdir('docs/archive')) {
+    if (f.endsWith('.json') && Date.parse(f.slice(0, 10)) < limit) {
+      await rm(`docs/archive/${f}`);
+      console.log(`deleted old archive ${f}`);
+    }
+  }
+}
 
 await writeFile('state/seen.json', JSON.stringify(seen, null, 2) + '\n');
 await writeFile('state/usage.json', JSON.stringify({ ...usage, spent_usd: Number(usage.spent_usd.toFixed(5)) }, null, 2) + '\n');

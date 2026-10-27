@@ -23,14 +23,21 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
         run: node generate.mjs
 
+      - name: Weekly quiz (Sundays only)
+        env:
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+        run: |
+          if [ "$(date -u +%u)" = "7" ]; then node quiz.mjs; else echo "Not Sunday, no quiz"; fi
+
       - name: Save the changes
         run: |
           git config user.name "maeil-news-bot"
           git config user.email "maeil-news-bot@users.noreply.github.com"
-          git add docs state
+          git add -A docs state
           if git diff --cached --quiet; then
             echo "Nothing new"
           else
             git commit -m "Daily news update $(date -u +%F)"
+            git pull --rebase -q origin main
             git push
           fi
