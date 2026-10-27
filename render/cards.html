@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maeil News cards</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Noto+Sans+KR:wght@400;700&display=swap">
+<style>
+/* The six Instagram cards, laid out as on the design boards (540 x 960, zoomed x2 for the 1080 x 1920 image). */
+:root {
+  --ink: #14121F; --paper: #FFF7EC; --lime: #C6F432; --pink: #FF4FA3; --highlight: #FF8C1A;
+  --font-display: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+  --font-kr: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--ink); }
+.slide {
+  width: 540px; height: 960px; overflow: hidden; position: relative;
+  padding: 26px 28px 22px; display: flex; flex-direction: column; gap: 12px;
+  font-family: var(--font-display); color: var(--fg); background: var(--bg);
+}
+body.render .slide { zoom: 2; }
+.topbar { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.pill { background: var(--paper); border-radius: 999px; padding: 4px 10px; display: inline-flex; align-items: center; }
+.pill img { height: 20px; width: auto; display: block; }
+.counter { font-size: 13px; font-weight: 800; }
+.label { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.kr-label { font-family: var(--font-kr); font-weight: 700; }
+.h1 { font-size: 40px; font-weight: 800; line-height: 1.08; text-wrap: balance; }
+.kr { font-family: var(--font-kr); font-size: 18px; font-weight: 700; line-height: 1.4; }
+.body-en { font-size: 19px; font-weight: 700; line-height: 1.3; }
+.body-kr { font-family: var(--font-kr); font-size: 14px; font-weight: 700; line-height: 1.45; }
+.bubble { max-width: 86%; border-radius: 24px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; color: var(--ink); }
+.bubble.dark { background: var(--ink); color: var(--paper); align-self: flex-start; border-radius: 24px 24px 24px 6px; }
+.bubble.dark .kr { color: var(--lime); font-size: 14px; }
+.bubble.pink { background: var(--pink); color: var(--ink); align-self: flex-end; border-radius: 24px 24px 6px 24px; }
+.bubble .en { font-size: 19px; font-weight: 700; line-height: 1.3; }
+.bubble .kr { font-size: 14px; line-height: 1.45; }
+.words { display: flex; flex-direction: column; gap: 6px; border-top: 3px solid var(--ink); padding-top: 8px; margin-top: auto; }
+.words-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 13px; line-height: 1.3; }
+.words-grid b { font-family: var(--font-kr); font-weight: 700; }
+.words-grid small { display: block; font-size: 11px; opacity: .8; }
+.foot { font-size: 12px; font-weight: 700; }
+.spacer { flex: 1; }
+.other { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.other-row { background: var(--paper); color: var(--ink); border-radius: 16px; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
+.other-row .ko { font-family: var(--font-kr); font-size: 22px; font-weight: 700; }
+.other-row .roman { font-size: 13px; font-weight: 700; opacity: .75; }
+.other-row .en { font-size: 15px; font-weight: 700; }
+.author { background: var(--paper); color: var(--ink); border-radius: 20px; padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.credit { display: flex; align-items: center; gap: 14px; }
+.credit img { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; object-position: center top; border: 4px solid var(--pink); flex: none; }
+.credit .who { font-size: 22px; font-weight: 800; line-height: 1.15; }
+.credit .who small { display: block; font-family: var(--font-kr); font-size: 14px; font-weight: 700; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="slide" id="slide"></div>
+
+<script>
+const D = window.__DATA__;
+const CARD = D.card;
+const IG = CARD.instagram || {};
+const LOGO = D.logo;
+const PHOTO = D.photo;
+const INK = '#14121F', PAPER = '#FFF7EC';
+const KR_CAT = { 'Politics & Society': '정치·사회', 'Business & Economy': '경제', 'Culture': '문화', 'Sports': '스포츠', 'Entertainment': '연예', 'World': '세계' };
+// Same category colours as the video. Background from the category; text colour chosen for contrast.
+const SKINS = {
+  'Politics & Society': { main: '#E63946', fg: PAPER },
+  'Business & Economy': { main: '#14B8A6', fg: INK },
+  'Culture':            { main: '#FFD21F', fg: INK },
+  'Sports':             { main: '#FF8C1A', fg: INK },
+  'Entertainment':      { main: '#2F80FF', fg: PAPER },
+  'World':              { main: '#1FAD5B', fg: INK }
+};
+const sk = SKINS[CARD.category] || { main: '#6C4DFF', fg: PAPER };
+document.body.style.background = INK;
+document.getElementById('slide').style.setProperty('--bg', sk.main);
+document.getElementById('slide').style.setProperty('--fg', sk.fg);
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const slides = IG.slides || [];
+const total = 1 + slides.length + 1 + 1; // cover, slides, other words, author
+
+function topbar(counter) {
+  return `<div class="topbar"><span class="brand"><span class="pill"><img src="${LOGO}" alt="What the! logo"></span> Maeil News · 매일 뉴스</span><span class="counter">${esc(counter)}</span></div>`;
+}
+
+function wordsBlock(title, words) {
+  const items = (words || []).map(w => `<div><b>${esc(w.ko)}</b> · ${esc(w.en)}${w.note ? `<small>${esc(w.note)}</small>` : ''}</div>`).join('');
+  return `<div class="words"><div class="label">${esc(title)}</div><div class="words-grid">${items}</div></div>`;
+}
+
+function coverCard() {
+  const firstSlide = slides[0];
+  const answerEn = firstSlide && firstSlide.en && firstSlide.en[0] ? firstSlide.en[0] : '';
+  const answerKr = firstSlide && firstSlide.ko && firstSlide.ko[0] ? firstSlide.ko[0] : '';
+  return `${topbar(CARD.category)}
+    <div class="label">${esc(CARD.category)} · ${esc(KR_CAT[CARD.category] || '')}</div>
+    <div class="h1">${esc(CARD.english_title)}</div>
+    <div class="kr">${esc(CARD.korean_title)}</div>
+    <div class="bubble dark"><div class="en">${esc(IG.hook_en)}</div><div class="kr">${esc(IG.hook_ko)}</div></div>
+    ${answerEn ? `<div class="bubble pink"><div class="en">${esc(answerEn)}</div><div class="kr">${esc(answerKr)}</div></div>` : ''}
+    ${wordsBlock('Important words · 중요한 단어', IG.hook_words)}
+    <div class="foot">Swipe for the story →</div>`;
+}
+
+function slideCard(sl, i) {
+  const en = (sl.en || []).map(s => `<div class="body-en">${esc(s)}</div>`).join('');
+  const kr = (sl.ko || []).map(s => `<div class="body-kr">${esc(s)}</div>`).join('');
+  return `${topbar(CARD.category)}
+    <div class="label">${i + 2} / ${total} · ${esc(sl.label_en)} · <span class="kr-label">${esc(sl.label_ko)}</span></div>
+    <div class="h1">${esc(sl.label_en)}?</div>
+    ${en}
+    <div class="body-kr">${kr}</div>
+    ${wordsBlock('Important words · 중요한 단어', sl.words)}
+    <div class="foot">Source: ${esc(CARD.source)}</div>`;
+}
+
+function otherCard() {
+  const rows = (IG.other_words || []).map(w => `<div class="other-row"><div class="ko">${esc(w.ko)}</div><div class="roman">${esc(w.roman)}</div><div class="en">${esc(w.en)}</div></div>`).join('');
+  return `${topbar(CARD.category)}
+    <div class="label">${total - 1} / ${total} · Other words · 다른 단어</div>
+    <div class="h1">Other words used in this post</div>
+    <div class="other">${rows}</div>`;
+}
+
+function authorCard() {
+  return `${topbar(CARD.category)}
+    <div class="spacer"></div>
+    <div class="author">
+      <div class="label">${total} / ${total} · Author · 작성자</div>
+      <div class="credit"><img src="${PHOTO}" alt="Deevena Angel Thirupathi"><div class="who">Deevena Angel Thirupathi<small>디웨나 엔젤 티루파티 · 매일 뉴스 작성</small></div></div>
+      <div class="body-en">Source: ${esc(CARD.source)}</div>
+      <div class="body-kr">출처: ${esc(CARD.source)}. 공유 전에 확인하세요.</div>
+      <div class="label">@deevena_angel_thirupathi</div>
+    </div>`;
+}
+
+// One entry per card. Each card has a 1000 ms slot on the timeline so the renderer can pick it.
+const scenes = [coverCard()];
+slides.forEach((sl, i) => scenes.push(slideCard(sl, i)));
+if ((IG.other_words || []).length) scenes.push(otherCard());
+scenes.push(authorCard());
+const timeline = scenes.map((html, i) => ({ start: i * 1000, end: (i + 1) * 1000, html }));
+const TOTAL = timeline.length * 1000;
+window.__cards = timeline.map((_, i) => i);
+
+let t = 0, playing = false, lastRenderedScene = -1;
+function render() {
+  const i = Math.max(0, Math.min(timeline.length - 1, Math.floor(t / 1000)));
+  if (i !== lastRenderedScene) {
+    document.getElementById('slide').innerHTML = timeline[i].html;
+    lastRenderedScene = i;
+  }
+}
+if (window.__RENDER__) document.body.classList.add('render');
+render();
+</script>
+</body>
+</html>

@@ -96,7 +96,7 @@ function synth(events, offsetS, totalS) {
 
 // ---------- rendering ----------
 
-async function renderPiece(browser, { template, data, name, outDir }) {
+async function renderPiece(browser, { template, cardTemplate, data, name, outDir }) {
   const tmpDir = path.join(ROOT, TMP_DIR, name);
   await mkdir(tmpDir, { recursive: true });
   const url = pathToFileURL(path.join(ROOT, template)).href;
@@ -134,7 +134,7 @@ async function renderPiece(browser, { template, data, name, outDir }) {
   const ctx2 = await browser.newContext({ viewport: VIEW });
   const p2 = await ctx2.newPage();
   await p2.addInitScript(initScript);
-  await p2.goto(url, { waitUntil: 'load' });
+  await p2.goto(pathToFileURL(path.join(ROOT, cardTemplate || template)).href, { waitUntil: 'load' });
   await p2.waitForTimeout(800);
   const cardScenes = await p2.evaluate('window.__cards');
   const cards = [];
@@ -164,7 +164,7 @@ try {
   for (const card of news.cards || []) {
     if (!card.save_allowed || !card.instagram || !card.id || !card.is_new) continue; // new articles only
     try {
-      const r = await renderPiece(browser, { template: 'render/article.html', data: { card, logo, photo }, name: card.id, outDir: MEDIA_DIR });
+      const r = await renderPiece(browser, { template: 'render/article.html', cardTemplate: 'render/cards.html', data: { card, logo, photo }, name: card.id, outDir: MEDIA_DIR });
       card.media = {
         video: `${MEDIA_BASE}/${path.basename(r.video)}`,
         cards: r.cards.map((f) => `${MEDIA_BASE}/${path.basename(f)}`)
