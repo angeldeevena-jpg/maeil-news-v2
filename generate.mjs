@@ -1,6 +1,7 @@
 // Maeil News v2: daily news collector.
-// Reads the Korean, Indian and global RSS feeds, asks the AI for Korean translations and
-// short summaries, and writes docs/news.json (for the app and the web page).
+// Reads the feeds for Korean, Indian and global news, takes the newest unseen articles
+// for each category (with a fixed count per category), asks the AI for Korean translations
+// and short summaries, and writes docs/news.json for the app and the web page.
 // Stores only headlines, short summaries, source names and links. No article images or full text.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
@@ -9,35 +10,37 @@ const config = JSON.parse(await readFile('config.json', 'utf8'));
 const today = new Date().toISOString().slice(0, 10);
 const now = new Date();
 const month = today.slice(0, 7);
-const MAX_PER_REGION = 6;      // new articles per region per run
-const SEEN_DAYS = 14;          // remember links this long, so nothing repeats
+const SEEN_DAYS = 14; // remember links this long, so nothing repeats
 
+// Categories: Politics & Society, Business & Economy, Culture, Sports, Entertainment, World.
+// quota = articles per category per day.
 const REGIONS = {
   korean: {
     label: 'Korean news',
     feeds: [
-      { source: 'The Korea Herald', category: 'Politics & Society', url: 'https://www.koreaherald.com/rss/kh_National' },
-      { source: 'The Korea Herald', category: 'Business', url: 'https://www.koreaherald.com/rss/kh_Business' },
-      { source: 'The Korea Herald', category: 'Culture', url: 'https://www.koreaherald.com/rss/kh_LifenCulture' },
-      { source: 'The Korea Herald', category: 'Sports', url: 'https://www.koreaherald.com/rss/kh_Sports' },
-      { source: 'The Korea Herald', category: 'Entertainment', url: 'https://www.koreaherald.com/rss/kh_Kpop' },
-      { source: 'The Korea Herald', category: 'World', url: 'https://www.koreaherald.com/rss/kh_World' }
+      { source: 'The Korea Herald', category: 'Politics & Society', quota: 4, url: 'https://www.koreaherald.com/rss/kh_National' },
+      { source: 'The Korea Herald', category: 'Business & Economy', quota: 4, url: 'https://www.koreaherald.com/rss/kh_Business' },
+      { source: 'The Korea Herald', category: 'Culture', quota: 4, url: 'https://www.koreaherald.com/rss/kh_LifenCulture' },
+      { source: 'The Korea Herald', category: 'Sports', quota: 4, url: 'https://www.koreaherald.com/rss/kh_Sports' },
+      { source: 'The Korea Herald', category: 'Entertainment', quota: 4, url: 'https://www.koreaherald.com/rss/kh_Kpop' },
+      { source: 'The Korea Herald', category: 'World', quota: 4, url: 'https://www.koreaherald.com/rss/kh_World' }
     ]
   },
   indian: {
     label: 'Indian news',
     feeds: [
-      { source: 'The Hindu', category: 'Politics & Society', url: 'https://www.thehindu.com/news/national/feeder/default.rss' },
-      { source: 'The Hindu', category: 'Business', url: 'https://www.thehindu.com/business/feeder/default.rss' },
-      { source: 'The Hindu', category: 'Culture', url: 'https://www.thehindu.com/life-and-style/feeder/default.rss' },
-      { source: 'The Hindu', category: 'Sports', url: 'https://www.thehindu.com/sport/feeder/default.rss' },
-      { source: 'The Hindu', category: 'Entertainment', url: 'https://www.thehindu.com/entertainment/feeder/default.rss' }
+      { source: 'The Hindu', category: 'Politics & Society', quota: 2, url: 'https://www.thehindu.com/news/national/feeder/default.rss' },
+      { source: 'The Hindu', category: 'Business & Economy', quota: 2, url: 'https://www.thehindu.com/business/feeder/default.rss' },
+      { source: 'The Hindu', category: 'Culture', quota: 2, url: 'https://www.thehindu.com/life-and-style/feeder/default.rss' },
+      { source: 'The Hindu', category: 'Sports', quota: 2, url: 'https://www.thehindu.com/sport/feeder/default.rss' },
+      { source: 'The Hindu', category: 'Entertainment', quota: 2, url: 'https://www.thehindu.com/entertainment/feeder/default.rss' },
+      { source: 'The Hindu International', category: 'World', quota: 2, url: 'https://www.thehindu.com/news/international/feeder/default.rss' }
     ]
   },
   global: {
     label: 'Global news',
     feeds: [
-      { source: 'The Hindu International', category: 'World', url: 'https://www.thehindu.com/news/international/feeder/default.rss' }
+      { source: 'The Hindu International', category: 'World', quota: 6, url: 'https://www.thehindu.com/news/international/feeder/default.rss' }
     ]
   }
 };
@@ -145,22 +148,29 @@ if (!config.enabled) {
 }
 
 const outCards = [];
-const newLinks = [];
 
 if (status !== 'off') {
+  // Regions run in order (Korean, Indian, Global) so an article is never used twice.
   for (const [regionKey, region] of Object.entries(REGIONS)) {
-    const fetched = (await Promise.all(region.feeds.map(fetchFeed))).flat();
-    const fresh = fetched
-      .filter((i) => !seen[i.link])
-      .sort((a, b) => (Date.parse(b.published) || 0) - (Date.parse(a.published) || 0))
-      .slice(0, MAX_PER_REGION);
+    const picked = [];
+    for (const feed of region.feeds) {
+      const items = await fetchFeed(feed);
+      const fresh = items
+        .filter((i) => !seen[i.link] && !outCards.some((c) => c.link === i.link))
+        .sort((a, b) => (Date.parse(b.published) || 0) - (Date.parse(a.published) || 0))
+        .slice(0, feed.quota);
+      if (fresh.length < feed.quota) {
+        console.log(`${regionKey}/${feed.category}: only ${fresh.length} of ${feed.quota} new`);
+      }
+      picked.push(...fresh);
+    }
 
-    if (fresh.length === 0) { console.log(`${regionKey}: no new articles`); continue; }
+    if (picked.length === 0) { console.log(`${regionKey}: no new articles`); continue; }
 
     let translated = [];
     if (status === 'ai') {
       try {
-        const r = await translateBatch(fresh);
+        const r = await translateBatch(picked);
         translated = r.cards;
       } catch (err) {
         console.log(`${regionKey}: AI failed, English only (${err.message})`);
@@ -168,7 +178,7 @@ if (status !== 'off') {
       }
     }
 
-    fresh.forEach((item, index) => {
+    picked.forEach((item, index) => {
       const t = translated.find((c) => c.index === index) || {};
       outCards.push({
         region: regionKey,
@@ -182,9 +192,8 @@ if (status !== 'off') {
         korean_summary: t.korean_summary || ''
       });
       seen[item.link] = Date.now();
-      newLinks.push(item.link);
     });
-    console.log(`${regionKey}: ${fresh.length} new`);
+    console.log(`${regionKey}: ${picked.length} articles`);
   }
 }
 
@@ -194,7 +203,7 @@ const newsPath = 'docs/news.json';
 const previous = await readJson(newsPath, { cards: [] });
 const cards = outCards.length ? outCards : (status === 'off' ? [] : previous.cards || []);
 const finalNote = outCards.length
-  ? `${outCards.length} new articles. ${note}`.trim()
+  ? `${outCards.length} articles. ${note}`.trim()
   : (note || 'No new articles this run. Showing the last set.');
 
 await mkdir('docs', { recursive: true });
@@ -211,4 +220,4 @@ await writeFile(newsPath, JSON.stringify({
 await writeFile('state/seen.json', JSON.stringify(seen, null, 2) + '\n');
 await writeFile('state/usage.json', JSON.stringify({ ...usage, spent_usd: Number(usage.spent_usd.toFixed(5)) }, null, 2) + '\n');
 
-console.log(`status=${status} new=${outCards.length} spent_this_month=$${usage.spent_usd.toFixed(4)}`);
+console.log(`status=${status} articles=${outCards.length} spent_this_month=$${usage.spent_usd.toFixed(4)}`);
