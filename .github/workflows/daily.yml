@@ -19,10 +19,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install fonts and the browser for making videos
+      - name: Install fonts, ffmpeg and the browser for making videos
         run: |
           sudo apt-get update -y -q
-          sudo apt-get install -y -q fonts-noto-cjk
+          sudo apt-get install -y -q fonts-noto-cjk ffmpeg
+          ffmpeg -version | head -n 1
           npm install --no-save playwright@1.47.2
           npx playwright install --with-deps chromium
 
