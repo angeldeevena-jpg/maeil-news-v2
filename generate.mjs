@@ -1,8 +1,11 @@
 // Maeil News v2: daily news collector.
-// Reads the feeds for Korean, Indian and global news, takes the newest unseen articles
-// for each category (with a fixed count per category), asks the AI for Korean translations
-// and short summaries, and writes docs/news.json for the app and the web page.
-// Stores only headlines, short summaries, source names and links. No article images or full text.
+// For each region, takes the newest unseen articles per category (fixed counts), reads each
+// article's main text, and asks the AI for:
+//   - a Korean title with a translation of each word
+//   - a 5-sentence summary in English, with the same 5 sentences in Korean
+//   - a translation of each Korean word in those sentences
+// Writes docs/news.json. Stores only the AI's summary and words, the headline, the source and the
+// link. Article text is read for the summary and is not stored.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 
@@ -10,7 +13,9 @@ const config = JSON.parse(await readFile('config.json', 'utf8'));
 const today = new Date().toISOString().slice(0, 10);
 const now = new Date();
 const month = today.slice(0, 7);
-const SEEN_DAYS = 14; // remember links this long, so nothing repeats
+const SEEN_DAYS = 14;        // remember links this long, so nothing repeats
+const ARTICLE_CHARS = 4000;  // article text sent to the AI, per article
+const AI_BATCH = 8;          // articles per AI call
 
 // Categories: Politics & Society, Business & Economy, Culture, Sports, Entertainment, World.
 // quota = articles per category per day.
@@ -44,7 +49,7 @@ const REGIONS = {
   }
 };
 
-// ---------- small helpers ----------
+// ---------- helpers ----------
 
 function clean(s = '') {
   return s
@@ -72,17 +77,32 @@ function parseItems(xml) {
   }).filter((i) => i.title && i.link);
 }
 
+const UA = { 'User-Agent': 'MaeilNewsBot/2.0 (daily headlines; contact via repository)' };
+
 async function fetchFeed(feed) {
   try {
-    const res = await fetch(feed.url, {
-      headers: { 'User-Agent': 'MaeilNewsBot/2.0 (daily headlines; contact via repository)' },
-      signal: AbortSignal.timeout(25000)
-    });
+    const res = await fetch(feed.url, { headers: UA, signal: AbortSignal.timeout(25000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return parseItems(await res.text()).map((i) => ({ ...i, source: feed.source, category: feed.category }));
   } catch (err) {
     console.log(`feed failed: ${feed.url} (${err.message})`);
     return [];
+  }
+}
+
+// Reads the article page and keeps the paragraphs of the main text.
+async function fetchArticleText(url) {
+  try {
+    const res = await fetch(url, { headers: UA, signal: AbortSignal.timeout(25000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const html = await res.text();
+    const paras = [...html.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)]
+      .map((m) => clean(m[1]))
+      .filter((p) => p.length >= 60 && !/cookie|subscribe|copyright|advertisement/i.test(p));
+    return paras.join('\n').slice(0, ARTICLE_CHARS);
+  } catch (err) {
+    console.log(`article failed: ${url} (${err.message})`);
+    return '';
   }
 }
 
@@ -104,30 +124,44 @@ for (const link of Object.keys(seen)) if (seen[link] < cutoff) delete seen[link]
 const apiKey = process.env.AI_API_KEY || '';
 const price = config.price_per_million_tokens;
 
+const SYSTEM = `You write for a Korean-learning news app. For each numbered news item (English headline and article text), return JSON:
+{"cards":[{
+  "index": number,
+  "korean_title": "natural Korean headline, under 30 characters",
+  "korean_title_words": [{"ko": "Korean word as it appears in korean_title", "en": "short English meaning"}],
+  "summary": [
+    {"en": "one English sentence from the article, 5 sentences in total in story order",
+     "ko": "natural Korean translation of that sentence, polite style (-요/-습니다)",
+     "words": [{"ko": "each Korean word in the ko sentence, as it appears (particles attached are fine)", "en": "short English meaning"}]}
+  ]
+}]}
+Rules: exactly 5 summary items. Facts must match the article; do not add facts. If the article text is missing, write the 5 sentences from the headline and say so in nothing else. Return only JSON.`;
+
 async function translateBatch(items) {
-  const system = `You write for a Korean-learning news site. For each numbered English news item, return JSON:
-{"cards":[{"index":number,"korean_title":"natural Korean headline, under 30 characters","korean_summary":"one or two natural Korean sentences, polite style (-요/-습니다)","english_summary":"one plain English sentence, under 30 words"}]}
-Keep facts exactly as the article states them. Do not add facts. Return only JSON.`;
   const body = {
     model: config.model,
     response_format: { type: 'json_object' },
     messages: [
-      { role: 'system', content: system },
-      { role: 'user', content: JSON.stringify(items.map((it, index) => ({ index, title: it.title, description: it.description }))) }
+      { role: 'system', content: SYSTEM },
+      { role: 'user', content: JSON.stringify(items.map((it, index) => ({
+          index,
+          headline: it.title,
+          article: it.text || it.description
+        }))) }
     ]
   };
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(120000)
+    signal: AbortSignal.timeout(300000)
   });
   if (!res.ok) throw new Error(`AI HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const data = await res.json();
   const cost = (data.usage.prompt_tokens / 1e6) * price.input + (data.usage.completion_tokens / 1e6) * price.output;
   usage.spent_usd += cost;
   const parsed = JSON.parse(data.choices[0].message.content);
-  return { cards: parsed.cards || [], cost };
+  return parsed.cards || [];
 }
 
 // ---------- main ----------
@@ -140,10 +174,10 @@ if (!config.enabled) {
   note = 'Turned off in config.json. No AI calls, no new articles.';
 } else if (!apiKey) {
   status = 'no key';
-  note = 'AI_API_KEY is not set. Articles are English only.';
+  note = 'AI_API_KEY is not set. Articles are English headlines only.';
 } else if (usage.spent_usd >= config.monthly_cap_usd) {
   status = 'cap reached';
-  note = `Monthly limit of $${config.monthly_cap_usd} reached. Articles are English only until next month.`;
+  note = `Monthly limit of $${config.monthly_cap_usd} reached. Articles are English headlines only until next month.`;
 }
 
 const outCards = [];
@@ -155,7 +189,7 @@ if (status !== 'off') {
     for (const feed of region.feeds) {
       const items = await fetchFeed(feed);
       const fresh = items
-        .filter((i) => !seen[i.link] && !outCards.some((c) => c.link === i.link))
+        .filter((i) => !seen[i.link] && !picked.some((p) => p.link === i.link) && !outCards.some((c) => c.link === i.link))
         .sort((a, b) => (Date.parse(b.published) || 0) - (Date.parse(a.published) || 0))
         .slice(0, feed.quota);
       if (fresh.length < feed.quota) {
@@ -166,19 +200,27 @@ if (status !== 'off') {
 
     if (picked.length === 0) { console.log(`${regionKey}: no new articles`); continue; }
 
-    let translated = [];
+    // Read each article's text (only needed when the AI is on).
     if (status === 'ai') {
-      try {
-        const r = await translateBatch(picked);
-        translated = r.cards;
-      } catch (err) {
-        console.log(`${regionKey}: AI failed, English only (${err.message})`);
-        note += ` ${region.label}: AI call failed, English only.`;
+      for (const item of picked) item.text = await fetchArticleText(item.link);
+    }
+
+    const results = [];
+    if (status === 'ai') {
+      for (let i = 0; i < picked.length; i += AI_BATCH) {
+        const chunk = picked.slice(i, i + AI_BATCH);
+        try {
+          const cards = await translateBatch(chunk);
+          for (const c of cards) results[i + c.index] = c;
+        } catch (err) {
+          console.log(`${regionKey}: AI batch failed (${err.message})`);
+          note += ` ${region.label}: some articles have English headlines only.`;
+        }
       }
     }
 
     picked.forEach((item, index) => {
-      const t = translated.find((c) => c.index === index) || {};
+      const t = results[index] || {};
       outCards.push({
         region: regionKey,
         category: item.category,
@@ -186,9 +228,10 @@ if (status !== 'off') {
         link: item.link,
         published: item.published,
         english_title: item.title,
-        english_summary: t.english_summary || item.description.slice(0, 200),
         korean_title: t.korean_title || '',
-        korean_summary: t.korean_summary || ''
+        korean_title_words: t.korean_title_words || [],
+        summary: t.summary || [],
+        save_allowed: regionKey === 'korean' // save cards, Instagram post and video: Korean articles only
       });
       seen[item.link] = Date.now();
     });
