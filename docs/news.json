@@ -1,7 +1,206 @@
 {
   "date": "2026-10-27",
-  "generated_at": "2026-10-27T19:02:03.711Z",
-  "status": "no key",
-  "note": "AI_API_KEY is not set. Articles are English only.",
-  "cards": []
+  "generated_at": "2026-10-27T19:04:23.964Z",
+  "status": "ai",
+  "note": "18 new articles.",
+  "cards": [
+    {
+      "region": "korean",
+      "category": "Politics & Society",
+      "source": "The Korea Herald",
+      "link": "https://www.koreaherald.com/article/10916774",
+      "published": "Tue, 27 Oct 2026 20:14:08 +09:00",
+      "english_title": "Lawmaker calls for scrutiny of labor-sending countries over migrant worker penalties",
+      "english_summary": "A lawmaker has called for oversight to protect migrant workers from penalties by their home countries.",
+      "korean_title": "법 의원, 외국인 근로자 보호 촉구",
+      "korean_summary": "국회 의원이 한국 내 외국인 근로자가 본국에서 불이익을 받지 않도록 감시를 요구했습니다. 이는 우즈벡과 방글라데시가 발표한 내용에 따른 것입니다."
+    },
+    {
+      "region": "korean",
+      "category": "Culture",
+      "source": "The Korea Herald",
+      "link": "https://www.koreaherald.com/article/10916769",
+      "published": "Tue, 27 Oct 2026 20:04:51 +09:00",
+      "english_title": "The Hanok Heritage named Best New Hotel at Tatler awards",
+      "english_summary": "The Hanok Heritage has been named Best New Hotel at the Tatler awards, becoming the only Korean winner.",
+      "korean_title": "한옥 헤리티지, 최고의 신호텔로 선정",
+      "korean_summary": "강원도 영월에 위치한 한옥 리조트가 타틀러 아시아 태평양 어워드에서 최고 신호텔로 선정되었습니다. 한국 호텔로는 유일한 수상입니다."
+    },
+    {
+      "region": "korean",
+      "category": "Politics & Society",
+      "source": "The Korea Herald",
+      "link": "https://www.koreaherald.com/article/10916760",
+      "published": "Tue, 27 Oct 2026 19:43:25 +09:00",
+      "english_title": "Supreme Court issues new detention warrant for former first lady Kim Keon Hee",
+      "english_summary": "The Supreme Court issued a new detention warrant for former first lady Kim Keon Hee due to flight and evidence destruction risks.",
+      "korean_title": "대법원, 김건희 영장 추가 발부",
+      "korean_summary": "대법원이 전 영부인 김건희에 대한 추가 구속영장을 발부했습니다. 그녀는 증거인멸 우려로 2개월 더 구속됩니다."
+    },
+    {
+      "region": "korean",
+      "category": "Politics & Society",
+      "source": "The Korea Herald",
+      "link": "https://www.koreaherald.com/article/10916758",
+      "published": "Tue, 27 Oct 2026 19:41:47 +09:00",
+      "english_title": "Top court issues additional arrest warrant for jailed ex-first lady",
+      "english_summary": "The top court issued an additional arrest warrant for ex-first lady Kim Keon Hee to extend her custody for two months.",
+      "korean_title": "전 영부인, 추가 구속영장 발부",
+      "korean_summary": "대법원이 전 영부인 김건희에 대해 추가적인 구속영장을 발부했습니다. 이로 인해 그녀의 구속이 두 달 연장되었습니다."
+    },
+    {
+      "region": "korean",
+      "category": "Culture",
+      "source": "The Korea Herald",
+      "link": "https://www.koreaherald.com/article/10916750",
+      "published": "Tue, 27 Oct 2026 19:34:34 +09:00",
+      "english_title": "Baby panda Shu Bao to make public debut at Everland",
+      "english_summary": "Baby panda Shu Bao will make her first public appearance at Everland starting Friday.",
+      "korean_title": "아기 판다 슈바오, 첫 공개",
+      "korean_summary": "에버랜드의 아기 판다 슈바오가 금요일부터 첫 공개됩니다. 그녀는 한국에서 태어난 네 번째 판다입니다."
+    },
+    {
+      "region": "korean",
+      "category": "Politics & Society",
+      "source": "The Korea Herald",
+      "link": "https://www.koreaherald.com/article/10916749",
+      "published": "Tue, 27 Oct 2026 19:34:12 +09:00",
+      "english_title": "3 ex-officials appeal to top court over 2019 deportation of N. Koreans",
+      "english_summary": "Three former officials have appealed to the Supreme Court over their sentencing for forcibly repatriating North Korean fishermen.",
+      "korean_title": "3 전직 관료, 대법원에 항소",
+      "korean_summary": "세 명의 전직 정부 관료가 2019년 북한 어선을 강제 송환한 사건으로 대법원에 항소했습니다. 이들은 모두 유죄 판결을 받았습니다."
+    },
+    {
+      "region": "indian",
+      "category": "Politics & Society",
+      "source": "The Hindu",
+      "link": "https://www.thehindu.com/news/national/tamil-nadu/three-girls-missing-in-tiruvannamalai/article71632323.ece",
+      "published": "Wed, 28 Oct 2026 00:18:58 +0530",
+      "english_title": "Three girls missing in Tiruvannamalai",
+      "english_summary": "Three girls are missing as their parents work in Kerala and visit home occasionally.",
+      "korean_title": "티루바남말라이서 세 명 실종",
+      "korean_summary": "경찰에 따르면, 소녀들의 부모는 Kerala에서 일하며 가끔 집에 방문한다고 합니다."
+    },
+    {
+      "region": "indian",
+      "category": "Politics & Society",
+      "source": "The Hindu",
+      "link": "https://www.thehindu.com/news/cities/chennai/highways-dept-calls-for-consultants-to-prepare-dpr-on-linking-omr-ecr/article71632390.ece",
+      "published": "Wed, 28 Oct 2026 00:17:55 +0530",
+      "english_title": "Highways Dept. calls for consultants to prepare DPR on linking OMR, ECR",
+      "english_summary": "The Highways Dept. is calling for consultants to prepare the DPR in three months.",
+      "korean_title": "도로국, OMR-ECR 연결 DPR 요청",
+      "korean_summary": "DPR은 3개월 이내에 작성되어야 합니다."
+    },
+    {
+      "region": "indian",
+      "category": "Sports",
+      "source": "The Hindu",
+      "link": "https://www.thehindu.com/sport/hockey/asian-champions-trophy-india-slams-13-past-hapless-bangladesh/article71633129.ece",
+      "published": "Wed, 28 Oct 2026 00:17:11 +0530",
+      "english_title": "Asian Champions Trophy: India slams 13 past hapless Bangladesh",
+      "english_summary": "India scored 13 goals against Bangladesh, with Mandeep Singh striking three.",
+      "korean_title": "아시아 챔피언스 트로피: 인도, 방글라데시를 제압",
+      "korean_summary": "만딥 싱이 3골을 기록하고 여러 골을 만들어냈습니다."
+    },
+    {
+      "region": "indian",
+      "category": "Politics & Society",
+      "source": "The Hindu",
+      "link": "https://www.thehindu.com/news/national/andhra-pradesh/cyclone-arnab-heavy-rain-brings-vizag-to-standstill-civic-agencies-on-high-alert/article71632812.ece",
+      "published": "Wed, 28 Oct 2026 00:16:50 +0530",
+      "english_title": "Cyclone Arnab: heavy rain brings Vizag to standstill; civic agencies on high alert",
+      "english_summary": "Heavy rain has brought Vizag to a standstill, with agencies on high alert.",
+      "korean_title": "사이클론 아르나브: 비자크 스탠드스틸",
+      "korean_summary": "낙뢰, 물에 잠긴 도로와 전력 중단이 혼란을 가중시키고 있습니다."
+    },
+    {
+      "region": "indian",
+      "category": "Politics & Society",
+      "source": "The Hindu",
+      "link": "https://www.thehindu.com/news/national/uttar-pradesh/a-delhi-event-unveils-fault-lines-in-the-dalit-obc-formulation-of-sp-politics/article71632477.ece",
+      "published": "Wed, 28 Oct 2026 00:01:40 +0530",
+      "english_title": "A Delhi event unveils fault lines in the Dalit-OBC formulation of SP politics",
+      "english_summary": "A Delhi event highlighted the limits of SP's Dalit-OBC political formulation.",
+      "korean_title": "델리 행사, 달리트-OBC 정치의 균열 드러내다",
+      "korean_summary": "라즈쿠마르 바티가 암베드카르의 맹세를 암송한 것이 SP의 한계점을 보여줍니다."
+    },
+    {
+      "region": "indian",
+      "category": "Politics & Society",
+      "source": "The Hindu",
+      "link": "https://www.thehindu.com/news/national/karnataka/jain-seer-gives-karnataka-govt-10-day-deadline-to-meet-demands-threatens-sallekhana-in-december-if-demands-remain-unmet/article71631286.ece",
+      "published": "Tue, 27 Oct 2026 23:57:57 +0530",
+      "english_title": "Jain seer gives Karnataka govt. 10-day deadline to meet demands; threatens sallekhana in December if demands remain unmet",
+      "english_summary": "A Jain seer has given Karnataka government 10 days to meet their demands.",
+      "korean_title": "자인 스님, 카르나타카 정부에 10일 기한 부여",
+      "korean_summary": "아차리아 구나다하라난디 마하라지가 요구사항 보장을 위해 10일의 기한을 주었습니다."
+    },
+    {
+      "region": "global",
+      "category": "World",
+      "source": "The Hindu International",
+      "link": "https://www.thehindu.com/news/international/brazilsflavio-bolsonaro-headed-to-us-after-losing-election-sources-say/article71633165.ece",
+      "published": "Wed, 28 Oct 2026 00:01:54 +0530",
+      "english_title": "Brazil's Flavio Bolsonaro headed to U.S. after losing election, sources say",
+      "english_summary": "Flavio Bolsonaro is heading to the U.S. after losing the election, as sources report.",
+      "korean_title": "브라질 플라비오 볼소나루, 미국행",
+      "korean_summary": "플라비오 볼소나루가 선거에서 패한 후 미국으로 향합니다. 그의 아버지, 자이르 볼소나루 전 대통령은 사법적 박해의 피해자라고 주장합니다."
+    },
+    {
+      "region": "global",
+      "category": "World",
+      "source": "The Hindu International",
+      "link": "https://www.thehindu.com/news/international/explosions-heard-over-riyadh-as-saudi-authorities-say-houthi-missiles-downed/article71633118.ece",
+      "published": "Tue, 27 Oct 2026 23:12:42 +0530",
+      "english_title": "Explosions heard over Riyadh as Saudi authorities say Houthi missiles downed",
+      "english_summary": "Explosions were heard over Riyadh as Saudi authorities reported downed Houthi missiles.",
+      "korean_title": "리야드에서 폭발음 포착",
+      "korean_summary": "사우디 당국은 후티 미사일이 격추되었다고 밝혔습니다. 후티군은 유혈 사태가 심각하다고 주장하고 있습니다."
+    },
+    {
+      "region": "global",
+      "category": "World",
+      "source": "The Hindu International",
+      "link": "https://www.thehindu.com/news/international/attacks-kill-at-least-60-orthodox-christians-in-ethiopia-church-says/article71633099.ece",
+      "published": "Tue, 27 Oct 2026 23:06:28 +0530",
+      "english_title": "Attacks kill at least 60 Orthodox Christians in Ethiopia, church says",
+      "english_summary": "Attacks in Ethiopia have killed at least 60 Orthodox Christians, according to the church.",
+      "korean_title": "에티오피아에서 기독교인 공격",
+      "korean_summary": "교회에 따르면, 이번 공격으로 최소 60명의 정교회 신자가 사망했습니다. 잔인한 학살로 묘사되고 있습니다."
+    },
+    {
+      "region": "global",
+      "category": "World",
+      "source": "The Hindu International",
+      "link": "https://www.thehindu.com/news/international/norway-finland-leaders-hold-frank-and-substantive-talk-with-putin/article71632960.ece",
+      "published": "Tue, 27 Oct 2026 22:57:22 +0530",
+      "english_title": "Norway, Finland leaders hold 'frank and substantive' talk with Putin",
+      "english_summary": "Norway and Finland leaders held substantive talks with Putin regarding the impact of the war.",
+      "korean_title": "노르웨이와 핀란드, 푸틴과 대화",
+      "korean_summary": "두 나라의 리더들이 푸틴과 의미 있는 대화를 나눴습니다. 전쟁의 결과가 유럽의 안보에 직접적인 영향을 미친다고 강조했습니다."
+    },
+    {
+      "region": "global",
+      "category": "World",
+      "source": "The Hindu International",
+      "link": "https://www.thehindu.com/news/international/record-turnout-as-israeli-voters-deliver-verdict-on-netanyahu/article71632993.ece",
+      "published": "Tue, 27 Oct 2026 22:36:47 +0530",
+      "english_title": "Record turnout as Israeli voters deliver verdict on Netanyahu",
+      "english_summary": "Israeli voters are casting their ballots amid concerns about accountability and security after the October 7 attacks.",
+      "korean_title": "이스라엘 유권자들, 넬탄야 결단",
+      "korean_summary": "이스라엘 유권자들이 넬탄야에 대한 투표를 하고 있습니다. 10월 7일의 사건 이후 안전과 책임 문제가 중심이 되고 있습니다."
+    },
+    {
+      "region": "global",
+      "category": "World",
+      "source": "The Hindu International",
+      "link": "https://www.thehindu.com/news/international/netanyahus-rival-eisenkot-urges-voters-to-unseat-worst-govt-in-israeli-history/article71631613.ece",
+      "published": "Tue, 27 Oct 2026 22:22:56 +0530",
+      "english_title": "On election day, Israeli settlers look beyond Netanyahu to far right",
+      "english_summary": "Israeli settlers are looking beyond Netanyahu to the far right on election day.",
+      "korean_title": "이스라엘 정착민들, 극우 벗어나길",
+      "korean_summary": "이스라엘 정착민들이 넬탄야를 넘어 극우를 바라보고 있습니다. 그들은 서안 지구에 50만 명 이상 거주하고 있습니다."
+    }
+  ]
 }
