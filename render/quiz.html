@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maeil News quiz video</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Noto+Sans+KR:wght@400;700&display=swap">
+<style>
+:root {
+  --stage: #14121F; --ink: #14121F; --paper: #FFF7EC; --muted: #B9B2C7; --accent: #FF8C1A;
+  --font-display: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+  --font-kr: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--stage); color: var(--paper); font-family: var(--font-display);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px; display: flex; flex-direction: column; align-items: center; gap: 14px; min-height: 100%;
+}
+.phone {
+  height: min(78vh, 700px); aspect-ratio: 9 / 16; max-width: 100%; border-radius: 22px; overflow: hidden;
+  position: relative; background: var(--paper); box-shadow: 0 10px 40px rgba(0,0,0,.45);
+}
+.scene > * { flex-shrink: 0; }
+.scene {
+  position: absolute; inset: 0; padding: 16% 7% 5%; display: flex; flex-direction: column;
+  justify-content: center; gap: 12px; color: var(--fg); background: var(--bg);
+}
+.topbar { position: absolute; top: 4%; left: 7%; right: 7%; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--fg); }
+.brand { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.pill { background: var(--paper); border-radius: 999px; padding: 4px 9px; display: inline-flex; align-items: center; }
+.pill img { height: 14px; width: auto; display: block; }
+.progress { display: flex; gap: 4px; }
+.progress span { flex: 1; height: 7px; border-radius: 999px; background: var(--fg); opacity: .3; }
+.progress span.on { opacity: 1; }
+
+.qhead { display: flex; justify-content: space-between; align-items: center; }
+.level { background: var(--paper); color: var(--ink); border-radius: 999px; padding: 6px 13px; font-size: 13px; font-weight: 800; }
+.timer { position: relative; width: 52px; height: 52px; flex: none; }
+.timer svg { width: 100%; height: 100%; display: block; transform: rotate(-90deg); }
+.timer .num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: var(--ink); }
+.timer.hidden { visibility: hidden; }
+
+.card { background: var(--paper); color: var(--ink); border-radius: 20px; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.q-en { font-size: 21px; font-weight: 800; line-height: 1.14; text-wrap: balance; min-height: 1.14em; }
+.q-kr { font-family: var(--font-kr); font-size: 14px; font-weight: 700; line-height: 1.4; color: #B8860B; min-height: 1.4em; }
+.caret::after { content: "▍"; margin-left: 2px; opacity: .6; }
+
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.opt { background: var(--paper); color: var(--ink); border-radius: 14px; padding: 6px 8px; display: flex; align-items: center; gap: 7px; min-width: 0; opacity: 0; transform: translateY(14px); transition: opacity 300ms ease, transform 300ms ease; }
+.opt.show { opacity: 1; transform: none; }
+.opt .letter { width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; flex: none; }
+.opt .txt { display: flex; flex-direction: column; min-width: 0; }
+.opt .txt b { font-size: 14px; line-height: 1.15; font-weight: 800; }
+.opt .txt small { font-family: var(--font-kr); font-size: 12px; font-weight: 700; }
+
+.reveal-badge { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.reveal-badge .tick { width: 52px; height: 52px; border-radius: 50%; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; flex: none; }
+.answer { background: var(--paper); color: var(--ink); border-radius: 24px; padding: 18px 18px; border: 4px solid var(--ink); display: flex; flex-direction: column; gap: 6px; animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; }
+.answer b { font-size: 36px; font-weight: 800; line-height: 1.04; }
+.answer small { font-family: var(--font-kr); font-size: 21px; font-weight: 700; }
+.why { background: var(--ink); color: var(--paper); border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.why .label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #C6F432; }
+.why p { margin: 0; font-size: 17px; line-height: 1.35; }
+.why small { font-family: var(--font-kr); font-size: 15px; line-height: 1.45; font-weight: 700; }
+
+.remark-en { font-size: 38px; font-weight: 800; line-height: 1.08; text-wrap: balance; animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; }
+.remark-kr { font-family: var(--font-kr); font-size: 21px; font-weight: 700; line-height: 1.45; animation: fade 800ms ease-out 350ms both; }
+
+.cta { opacity: 0; animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; background: var(--ink); color: var(--paper); border-radius: 18px; padding: 12px 16px; display: flex; flex-direction: column; gap: 4px; }
+.cta b { font-size: 17px; font-weight: 800; line-height: 1.15; }
+.cta small { font-family: var(--font-kr); font-size: 14px; font-weight: 700; }
+
+.intro-big { font-size: 46px; font-weight: 800; line-height: 1.04; animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; }
+.intro-kr { font-family: var(--font-kr); font-size: 24px; font-weight: 700; animation: fade 800ms ease-out 400ms both; }
+.cover-kicker { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.cover-art { width: 100%; height: auto; display: block; }
+.cover-art .body { animation: fade 600ms ease-out both; transform-box: fill-box; transform-origin: center; }
+.cover-art .draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 600ms ease-out both; }
+.cover-art .stamp { transform-box: fill-box; transform-origin: center; animation: pop 600ms cubic-bezier(.2,1.4,.4,1) both; }
+.cover-en { font-size: 40px; font-weight: 800; line-height: 1.08; text-wrap: balance; }
+.cover-en .w { display: inline-block; opacity: 0; animation: rise 520ms ease-out both; }
+.cover-kr { font-family: var(--font-kr); font-size: 22px; font-weight: 700; line-height: 1.4; opacity: 0; animation: fade 700ms ease-out 2000ms both; }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+@keyframes pop { from { transform: scale(.6) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fade { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+
+.foot { position: absolute; left: 7%; right: 7%; bottom: 3%; display: flex; align-items: center; gap: 7px; font-size: 10px; font-weight: 800; color: var(--fg); }
+.foot img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; border: 2px solid #FF4FA3; flex: none; }
+
+.controls { display: flex; flex-direction: column; align-items: center; gap: 10px; width: min(100%, 420px); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+button { font: inherit; font-weight: 800; font-size: 15px; background: var(--accent); color: var(--ink); border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+button.ghost { background: transparent; color: var(--paper); border: 2px solid var(--paper); }
+button:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+.dots { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; max-width: 420px; }
+.dots button { width: 12px; height: 12px; padding: 0; border-radius: 50%; background: #3a3550; }
+.dots button[aria-current="true"] { background: var(--accent); }
+.meta { font-size: 14px; color: var(--muted); text-align: center; }
+.bar-track { width: 100%; height: 6px; background: #3a3550; border-radius: 999px; overflow: hidden; }
+.bar-track > i { display: block; height: 100%; width: 0; background: var(--accent); }
+
+/* Video render mode: the 390px design fills 1080 × 1920 */
+body.render { width: 1080px; height: 1920px; padding: 0; gap: 0; overflow: hidden; align-items: flex-start; }
+body.render .phone { zoom: 2.7692; width: 390px; height: 693.33px; aspect-ratio: auto; max-width: none; border-radius: 0; box-shadow: none; }
+body.render .controls { display: none; }
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone" aria-live="polite"></div>
+
+<div class="controls">
+  <div class="bar-track" aria-hidden="true"><i id="bar"></i></div>
+  <div class="row">
+    <button id="play" type="button">▶ Play</button>
+    <button id="restart" type="button" class="ghost">↺ Restart</button>
+    <button id="sound" type="button" class="ghost" aria-pressed="true">Sound: on</button>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="meta" id="meta"></div>
+</div>
+
+<script>
+// Data for one week's quiz is injected by the renderer as window.__DATA__:
+// { quiz: <docs/quiz.json>, logo: <data URI>, photo: <data URI> }
+const D = window.__DATA__;
+const Q = D.quiz;
+const LOGO = D.logo, PHOTO = D.photo;
+const INK = '#14121F', PAPER = '#FFF7EC';
+if (window.__RENDER__) document.body.classList.add('render');
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const SKINS = {
+  'Politics & Society': { main: '#E63946', fg: PAPER },
+  'Business & Economy': { main: '#14B8A6', fg: INK },
+  'Culture':            { main: '#FFD21F', fg: INK },
+  'Sports':             { main: '#FF8C1A', fg: INK },
+  'Entertainment':      { main: '#2F80FF', fg: PAPER },
+  'World':              { main: '#1FAD5B', fg: INK }
+};
+
+// Timing: question types in, then options appear and the 7-second timer runs.
+// Reveal 5 seconds, then the remark for 3 seconds. Bonus has options and no timer.
+const EN_MS = 45, KR_MS = 110, GAP_MS = 300;
+const TIMER_MS = 7000, REVEAL_MS = 5000, REMARK_MS = 3000, BONUS_HOLD_MS = 9000;
+const RING_C = 2 * Math.PI * 34;
+
+// Questions from the quiz data, in order (regular questions first, bonus last).
+const QUIZ = Q.questions.map(q => ({
+  level: q.level_label,
+  cat: q.category,
+  q_en: q.question_en,
+  q_kr: q.question_ko,
+  options: q.options.map(o => ({ en: o.en, kr: o.kr ?? o.ko ?? '' })),
+  answer: q.answer,
+  why_en: q.why_en,
+  why_kr: q.why_kr,
+  remark: q.remark,
+  bonus: !!q.bonus
+}));
+const REGULAR = QUIZ.filter(q => !q.bonus);
+
+const scenes = [{ k: 'cover', dur: 6500, card: true }, { k: 'intro', dur: 3000 }];
+QUIZ.forEach((q, i) => {
+  const n = i + 1;
+  scenes.push({ k: 'question', q, n, card: i === 0 || q.bonus });
+  if (!q.bonus) {
+    scenes.push({ k: 'reveal', q, n, dur: REVEAL_MS, card: i === 0 });
+    scenes.push({ k: 'remark', q, n, text: q.remark || { en: '', kr: '' }, dur: REMARK_MS });
+  }
+});
+
+function typeEndMs(q) {
+  return [...q.q_en].length * EN_MS + GAP_MS + [...q.q_kr].length * KR_MS;
+}
+let cursor = 0;
+const timeline = scenes.map((s, i) => {
+  let dur = s.dur;
+  if (s.k === 'question') dur = typeEndMs(s.q) + (s.q.bonus ? BONUS_HOLD_MS : TIMER_MS);
+  const block = { i, start: cursor, end: cursor + dur, scene: s };
+  cursor += dur;
+  return block;
+});
+const TOTAL = cursor;
+window.__cards = timeline.filter(b => b.scene.card).map(b => b.i);
+
+const phone = document.getElementById('phone');
+const bar = document.getElementById('bar');
+const dotsEl = document.getElementById('dots');
+const playBtn = document.getElementById('play');
+const restartBtn = document.getElementById('restart');
+const soundBtn = document.getElementById('sound');
+document.getElementById('meta').textContent = `${Q.week || 'Weekly quiz'} · about ${Math.round(TOTAL / 1000)} seconds`;
+
+let t = 0, playing = false, lastFrame = 0, lastRenderedScene = -1;
+let lastCounts = { en: -1, kr: -1 };
+let optsShown = false, lastNum = null, lastTickSlot = -1;
+let soundOn = true, audioCtx = null;
+
+timeline.forEach((b, idx) => {
+  const d = document.createElement('button');
+  d.type = 'button';
+  d.setAttribute('aria-label', `Jump to scene ${idx + 1}`);
+  d.addEventListener('click', () => { t = b.start; lastRenderedScene = -1; playing = false; updatePlayButton(); render(); });
+  dotsEl.appendChild(d);
+});
+
+function updatePlayButton() {
+  playBtn.textContent = playing ? '❚❚ Pause' : (t >= TOTAL ? '↺ Replay' : '▶ Play');
+}
+
+// Sound (preview only; the downloadable video gets the same sounds from window.__events)
+function tone(freq, dur, gainVal, type = 'square', when = 0) {
+  if (!soundOn || !audioCtx) return;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  const t0 = audioCtx.currentTime + when;
+  osc.type = type; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(gainVal, t0);
+  gain.gain.exponentialRampToValueAtTime(0.0005, t0 + dur);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.02);
+}
+function click() { tone(1800 + Math.random() * 400, 0.025, 0.05, 'square'); }
+function tick(level) { tone(900 + level * 600, 0.05, 0.07 + level * 0.15, 'square'); }
+function introSound() {
+  tone(262, 2.4, 0.10, 'triangle', 0); tone(330, 2.4, 0.10, 'triangle', 0.25);
+  tone(392, 2.4, 0.10, 'triangle', 0.5); tone(523, 2.2, 0.12, 'triangle', 0.8);
+  tone(784, 1.6, 0.08, 'sine', 1.2); tone(98, 1.2, 0.25, 'sine', 0);
+}
+function chime() {
+  tone(523, 0.18, 0.12, 'triangle', 0); tone(659, 0.18, 0.12, 'triangle', 0.14); tone(784, 0.45, 0.14, 'triangle', 0.28);
+}
+
+// Every sound in the video, with its time in ms. The renderer turns these into the audio track.
+window.__events = () => {
+  const ev = [];
+  timeline.forEach(b => {
+    const s = b.scene, S = b.start;
+    if (s.k === 'cover') ev.push({ t: S, k: 'intro' });
+    if (s.k === 'reveal') ev.push({ t: S, k: 'chime' });
+    if (s.k !== 'question') return;
+    const q = s.q;
+    const en = [...q.q_en], kr = [...q.q_kr];
+    for (let k = 1; k <= en.length; k++) ev.push({ t: S + k * EN_MS, k: 'click' });
+    const krStart = en.length * EN_MS + GAP_MS;
+    for (let k = 1; k <= kr.length; k++) ev.push({ t: S + krStart + k * KR_MS, k: 'click' });
+    if (!q.bonus) {
+      // Timer ticks: once a second, then twice a second and louder in the last three seconds.
+      const typeEnd = typeEndMs(q);
+      let tl = 0;
+      while (tl < TIMER_MS) {
+        const rem = Math.max(0, Math.ceil((TIMER_MS - tl) / 1000));
+        ev.push({ t: S + typeEnd + tl, k: 'tick', level: rem <= 3 ? (4 - rem) / 3 : 0 });
+        tl += rem <= 3 ? 500 : 1000;
+      }
+    }
+  });
+  return ev;
+};
+
+function topbar(el, label) {
+  const top = document.createElement('div');
+  top.className = 'topbar';
+  top.innerHTML = `<span class="brand"><span class="pill"><img src="${LOGO}" alt="What the! logo"></span> Maeil News · 매일 뉴스</span><span>${esc(label)}</span>`;
+  el.appendChild(top);
+}
+
+function progressRow(activeCount) {
+  const p = document.createElement('div');
+  p.className = 'progress';
+  for (let i = 0; i < REGULAR.length; i++) {
+    const s = document.createElement('span');
+    if (i < activeCount) s.className = 'on';
+    p.appendChild(s);
+  }
+  return p;
+}
+
+// Cover art: a question bubble whose question mark draws itself, then a check stamp lands in the corner.
+function quizArt() {
+  return `<svg class="cover-art" viewBox="0 0 200 130" aria-hidden="true">
+    <path class="body" d="M30 14 H170 A16 16 0 0 1 186 30 V84 A16 16 0 0 1 170 100 H92 L70 122 L72 100 H30 A16 16 0 0 1 14 84 V30 A16 16 0 0 1 30 14 Z" fill="${PAPER}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <path class="draw-line" pathLength="1" style="animation-delay:300ms" d="M78 40 C78 22 122 22 122 42 C122 58 100 56 100 74 M100 88 L100 90" fill="none" stroke="${INK}" stroke-width="9" stroke-linecap="round"/>
+    <g class="stamp" style="animation-delay:1100ms">
+      <circle cx="158" cy="92" r="22" fill="#FF4FA3" stroke="${INK}" stroke-width="4"/>
+      <path class="draw-line" pathLength="1" style="animation-delay:1300ms" d="M147 92 L155 100 L170 84" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </svg>`;
+}
+
+function buildScene(block) {
+  const s = block.scene;
+  const label = s.q ? s.q.cat : 'Weekly quiz';
+  const sk = SKINS[(s.q && s.q.cat) || 'World'];
+  phone.innerHTML = '';
+  const el = document.createElement('div');
+  el.className = 'scene';
+  el.style.setProperty('--bg', sk.main);
+  el.style.setProperty('--fg', sk.fg);
+  topbar(el, label);
+  optsShown = false; lastNum = null; lastTickSlot = -1;
+
+  if (s.k === 'cover') {
+    const kick = document.createElement('div'); kick.className = 'cover-kicker'; kick.textContent = 'Weekly quiz · 주간 퀴즈';
+    const art = document.createElement('div'); art.innerHTML = quizArt();
+    const en = document.createElement('div'); en.className = 'cover-en';
+    "Think you know this week's news?".split(' ').forEach((word, i, arr) => {
+      const w = document.createElement('span');
+      w.className = 'w';
+      w.style.animationDelay = `${400 + i * 110}ms`;
+      w.textContent = word;
+      en.appendChild(w);
+      if (i < arr.length - 1) en.appendChild(document.createTextNode(' '));
+    });
+    const kr = document.createElement('div'); kr.className = 'cover-kr'; kr.textContent = '이번 주 뉴스, 얼마나 알고 계세요?';
+    el.append(kick, art, en, kr);
+  } else if (s.k === 'intro') {
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;gap:14px;';
+    wrap.innerHTML = `<div class="label" style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px">Weekly quiz · 주간 퀴즈</div>
+      <div class="intro-big">${esc(Q.intro ? Q.intro.en : '')}</div>
+      <div class="intro-kr">${esc(Q.intro ? Q.intro.kr : '')}</div>`;
+    el.appendChild(wrap);
+  } else if (s.k === 'question') {
+    const q = s.q;
+    const head = document.createElement('div'); head.className = 'qhead';
+    head.innerHTML = `<span class="level">${esc(q.level)}</span>
+      <div class="timer" id="timer"><svg viewBox="0 0 80 80">
+        <circle cx="40" cy="40" r="34" fill="none" stroke="${PAPER}" stroke-width="7" opacity=".35"/>
+        <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round"
+          stroke-dasharray="${RING_C}" stroke-dashoffset="0"/></svg>
+        <div class="num" id="num">7</div></div>`;
+    el.append(progressRow(Math.min(s.n, REGULAR.length)), head);
+    const card = document.createElement('div'); card.className = 'card';
+    const en = document.createElement('div'); en.className = 'q-en'; en.id = 'typeEn';
+    const kr = document.createElement('div'); kr.className = 'q-kr'; kr.id = 'typeKr';
+    card.append(en, kr);
+    const opts = document.createElement('div'); opts.className = 'options'; opts.id = 'opts';
+    const letters = ['A', 'B', 'C', 'D'];
+    q.options.forEach((o, i) => {
+      const row = document.createElement('div'); row.className = 'opt';
+      row.innerHTML = `<span class="letter">${letters[i]}</span><span class="txt"><b>${esc(o.en)}</b><small>${esc(o.kr)}</small></span>`;
+      opts.appendChild(row);
+    });
+    if (q.bonus) {
+      head.querySelector('.timer').classList.add('hidden');
+      const cta = document.createElement('div'); cta.className = 'cta';
+      cta.style.animationDelay = `${typeEndMs(q) + 800}ms`;
+      cta.innerHTML = '<b>Answer in the comments</b><small>댓글로 답을 남겨 주세요</small>';
+      el.append(card, opts, cta);
+    } else {
+      el.append(card, opts);
+    }
+  } else if (s.k === 'reveal') {
+    const q = s.q;
+    const letters = ['A', 'B', 'C', 'D'];
+    const head = document.createElement('div'); head.className = 'qhead';
+    head.innerHTML = `<span class="level">Answer · 정답 · Q${s.n}</span><span class="level">5 sec</span>`;
+    const badge = document.createElement('div'); badge.className = 'reveal-badge';
+    badge.innerHTML = `<span class="tick">✓</span><span>Correct · 정답 ${letters[q.answer]}</span>`;
+    const ans = document.createElement('div'); ans.className = 'answer';
+    ans.innerHTML = `<b>${esc(q.options[q.answer].en)}</b><small>${esc(q.options[q.answer].kr)}</small>`;
+    const why = document.createElement('div'); why.className = 'why';
+    why.innerHTML = `<div class="label">Why · 이유</div><p>${esc(q.why_en)}</p><small>${esc(q.why_kr)}</small>`;
+    el.append(progressRow(s.n), head, badge, ans, why);
+  } else if (s.k === 'remark') {
+    const big = document.createElement('div'); big.className = 'remark-en'; big.textContent = s.text.en;
+    const kr = document.createElement('div'); kr.className = 'remark-kr'; kr.textContent = s.text.kr;
+    el.append(progressRow(s.n), big, kr);
+  }
+  if (s.q && s.q.bonus) {
+    const f = document.createElement('div'); f.className = 'foot';
+    f.innerHTML = `<img src="${PHOTO}" alt="Photo of Deevena Angel Thirupathi"><span>Edited by Deevena Angel Thirupathi · 편집: 디웨나 엔젤 티루파티</span>`;
+    el.appendChild(f);
+  }
+  phone.appendChild(el);
+  lastCounts = { en: -1, kr: -1 };
+}
+
+function render() {
+  const block = timeline.find(b => t >= b.start && t < b.end) || timeline[timeline.length - 1];
+  if (t >= TOTAL) t = TOTAL;
+
+  if (block.i !== lastRenderedScene) {
+    buildScene(block);
+    if (block.scene.k === 'reveal') chime();
+    if (block.scene.k === 'cover') introSound();
+    lastRenderedScene = block.i;
+    [...dotsEl.children].forEach((c, n) => {
+      if (n === block.i) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current');
+    });
+  }
+
+  const local = t - block.start;
+  const s = block.scene;
+  if (s.k === 'question') {
+    const q = s.q;
+    const enChars = [...q.q_en];
+    const krChars = [...q.q_kr];
+    const enCount = Math.min(enChars.length, Math.floor(local / EN_MS));
+    const krStart = enChars.length * EN_MS + GAP_MS;
+    const krCount = local < krStart ? 0 : Math.min(krChars.length, Math.floor((local - krStart) / KR_MS));
+    const enEl = document.getElementById('typeEn');
+    const krEl = document.getElementById('typeKr');
+    if (enEl && enCount !== lastCounts.en) {
+      enEl.textContent = enChars.slice(0, enCount).join('');
+      enEl.classList.toggle('caret', enCount < enChars.length);
+      lastCounts.en = enCount;
+    }
+    if (krEl && krCount !== lastCounts.kr) {
+      krEl.textContent = krChars.slice(0, krCount).join('');
+      krEl.classList.toggle('caret', krCount > 0 && krCount < krChars.length);
+      lastCounts.kr = krCount;
+    }
+
+    const typeEnd = typeEndMs(q);
+    if (!optsShown && local >= typeEnd) {
+      optsShown = true;
+      document.querySelectorAll('#opts .opt').forEach((o, i) => {
+        o.style.transitionDelay = `${i * 120}ms`;
+        o.classList.add('show');
+      });
+    }
+    const tl = Math.max(0, local - typeEnd);
+    const remaining = Math.max(0, Math.ceil((TIMER_MS - tl) / 1000));
+    const numEl = document.getElementById('num');
+    const ring = document.getElementById('ring');
+    if (numEl && remaining !== lastNum) { numEl.textContent = remaining; lastNum = remaining; }
+    if (ring) ring.setAttribute('stroke-dashoffset', String(RING_C * Math.min(1, tl / TIMER_MS)));
+  }
+  bar.style.width = `${(t / TOTAL) * 100}%`;
+}
+
+function frame(now) {
+  if (playing) {
+    const dt = Math.min(64, now - lastFrame);
+    t += dt;
+    if (t >= TOTAL) { t = TOTAL; playing = false; updatePlayButton(); }
+  }
+  lastFrame = now;
+  render();
+  requestAnimationFrame(frame);
+}
+
+function ensureAudio() {
+  if (!audioCtx && window.AudioContext) {
+    try { audioCtx = new AudioContext(); } catch (e) { audioCtx = null; }
+  }
+}
+
+playBtn.addEventListener('click', () => {
+  ensureAudio();
+  if (t >= TOTAL) { t = 0; lastRenderedScene = -1; }
+  playing = !playing;
+  updatePlayButton();
+});
+restartBtn.addEventListener('click', () => { ensureAudio(); t = 0; lastRenderedScene = -1; playing = true; updatePlayButton(); });
+soundBtn.addEventListener('click', () => {
+  soundOn = !soundOn;
+  if (soundOn) ensureAudio();
+  soundBtn.textContent = `Sound: ${soundOn ? 'on' : 'off'}`;
+  soundBtn.setAttribute('aria-pressed', String(soundOn));
+});
+
+requestAnimationFrame(now => { lastFrame = now; requestAnimationFrame(frame); });
+updatePlayButton();
+</script>
+</body>
+</html>

@@ -8,6 +8,7 @@
 // link. Article text is read for the summary and is not stored.
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 
 const config = JSON.parse(await readFile('config.json', 'utf8'));
 const today = new Date().toISOString().slice(0, 10);
@@ -245,6 +246,7 @@ if (status !== 'off') {
     picked.forEach((item, index) => {
       const t = results[index] || {};
       outCards.push({
+        id: createHash('sha1').update(item.link).digest('hex').slice(0, 10), // names the media files
         region: regionKey,
         category: item.category,
         source: item.source,

@@ -11,12 +11,20 @@ permissions:
 jobs:
   news:
     runs-on: ubuntu-latest
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Install fonts and the browser for making videos
+        run: |
+          sudo apt-get update -y -q
+          sudo apt-get install -y -q fonts-noto-cjk
+          npm install --no-save playwright@1.47.2
+          npx playwright install --with-deps chromium
 
       - name: Collect news and translate
         env:
@@ -28,6 +36,47 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
         run: |
           if [ "$(date -u +%u)" = "7" ]; then node quiz.mjs; else echo "Not Sunday, no quiz"; fi
+
+      - name: Make videos and cards
+        run: |
+          TAG="media-$(date -u +%F)"
+          MEDIA_BASE="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}" TODAY="$(date -u +%F)" node render.mjs
+
+      - name: Publish videos and cards as a release (not stored in git)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="media-$(date -u +%F)"
+          if ls docs/media/* >/dev/null 2>&1; then
+            if gh release view "$TAG" >/dev/null 2>&1; then
+              gh release upload "$TAG" docs/media/* --clobber
+            else
+              gh release create "$TAG" docs/media/* --title "$TAG" --notes "Videos and cards for $TAG"
+            fi
+          else
+            echo "No media today"
+          fi
+
+      - name: Delete media releases older than 14 days (every other Sunday)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(date -u +%u)" = "7" ] && [ $(( 10#$(date -u +%V) % 2 )) -eq 0 ]; then
+            cutoff=$(date -u -d '14 days ago' +%F)
+            gh release list --limit 300 --json tagName -q '.[].tagName' | while read -r tag; do
+              case "$tag" in
+                media-*)
+                  d="${tag#media-}"
+                  if [[ "$d" < "$cutoff" ]]; then
+                    echo "Deleting $tag"
+                    gh release delete "$tag" --yes --cleanup-tag
+                  fi
+                  ;;
+              esac
+            done
+          else
+            echo "Not the cleanup day"
+          fi
 
       - name: Save the changes
         run: |

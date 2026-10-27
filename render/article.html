@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maeil News article video</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Noto+Sans+KR:wght@400;700&display=swap">
+<style>
+:root {
+  --stage: #14121F; --ink: #14121F; --paper: #FFF7EC; --muted: #B9B2C7; --accent: #FF8C1A;
+  --font-display: 'Bricolage Grotesque', 'Helvetica Neue', Arial, sans-serif;
+  --font-kr: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--stage); color: var(--paper); font-family: var(--font-display);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px; display: flex; flex-direction: column; align-items: center; gap: 14px; min-height: 100%;
+}
+.phone {
+  height: min(78vh, 700px); aspect-ratio: 9 / 16; max-width: 100%; border-radius: 22px; overflow: hidden;
+  position: relative; background: var(--paper); box-shadow: 0 10px 40px rgba(0,0,0,.45);
+}
+.scene { position: absolute; inset: 0; padding: 16% 7% 5%; display: flex; flex-direction: column; justify-content: center; gap: 12px; color: var(--fg); background: var(--bg); }
+.scene > * { flex-shrink: 0; }
+.topbar { position: absolute; top: 4%; left: 7%; right: 7%; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--fg); }
+.brand { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.pill { background: var(--paper); border-radius: 999px; padding: 4px 9px; display: inline-flex; align-items: center; }
+.pill img { height: 14px; width: auto; display: block; }
+.topic { opacity: .85; text-align: right; }
+
+.card { background: var(--paper); color: var(--ink); border-radius: 20px; padding: 20px 18px 22px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 6px 0 rgba(20,18,31,.18); }
+.label { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.en { font-size: 30px; font-weight: 800; line-height: 1.16; text-wrap: balance; min-height: 1.16em; }
+.kr { font-family: var(--font-kr); font-size: 21px; font-weight: 700; line-height: 1.45; min-height: 1.45em; }
+.caret::after { content: "▍"; margin-left: 2px; opacity: .6; }
+
+.trans-num { font-size: 15px; font-weight: 800; letter-spacing: 1px; }
+.trans-word { font-size: 46px; font-weight: 800; line-height: 1.05; text-wrap: balance; }
+.trans-kr { font-family: var(--font-kr); font-size: 26px; font-weight: 700; }
+.anim-wipe { animation: wipe 900ms ease-out both; }
+.anim-pop { animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; }
+.anim-drop { animation: drop 700ms cubic-bezier(.2,.9,.3,1) both; }
+.anim-fade { animation: fade 900ms ease-out both; }
+@keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes pop { from { transform: scale(.6) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes drop { from { transform: translateY(-60px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fade { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+
+.words-card { gap: 10px; }
+.word-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.word { background: #FFFFFF; color: var(--ink); border-radius: 14px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; animation: pop 500ms cubic-bezier(.2,1.4,.4,1) both; }
+.word b { font-family: var(--font-kr); font-size: 19px; font-weight: 700; line-height: 1.2; }
+.word span { font-size: 13px; font-weight: 800; line-height: 1.2; }
+.word small { font-size: 11px; opacity: .75; line-height: 1.2; }
+
+.cover-kicker { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+.cover-art { width: 58%; height: auto; display: block; align-self: center; }
+.cover-art .body { animation: fade 600ms ease-out both; transform-box: fill-box; transform-origin: center; }
+.cover-art .pin { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 500ms ease-out both; }
+.cover-art .bar { transform-box: fill-box; transform-origin: 50% 100%; animation: grow 600ms cubic-bezier(.2,.9,.3,1) both; }
+.cover-en { font-size: 31px; font-weight: 800; line-height: 1.1; text-wrap: balance; }
+.cover-en .w { display: inline-block; opacity: 0; animation: rise 520ms ease-out both; }
+.cover-kr { font-family: var(--font-kr); font-size: 17px; font-weight: 700; line-height: 1.4; opacity: 0; animation: fade 700ms ease-out 1900ms both; }
+.cover-hook { display: flex; flex-direction: column; gap: 4px; opacity: 0; animation: fade 700ms ease-out 2800ms both; }
+.cover-hook b { font-size: 19px; font-weight: 800; line-height: 1.2; text-wrap: balance; }
+.cover-hook small { font-family: var(--font-kr); font-size: 15px; font-weight: 700; line-height: 1.4; }
+@keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes grow { from { transform: scaleY(0); } to { transform: none; } }
+@keyframes rise { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+
+.credit { display: flex; align-items: center; gap: 14px; }
+.credit img.photo { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; object-position: center top; border: 4px solid #FF4FA3; flex: none; }
+.credit .who { font-size: 18px; font-weight: 800; line-height: 1.2; }
+.credit .who small { display: block; font-family: var(--font-kr); font-size: 14px; font-weight: 700; margin-top: 4px; }
+.src { font-size: 13px; font-weight: 800; line-height: 1.3; }
+.src-kr { font-family: var(--font-kr); font-size: 13px; font-weight: 700; line-height: 1.4; }
+
+.controls { display: flex; flex-direction: column; align-items: center; gap: 10px; width: min(100%, 420px); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center; }
+button { font: inherit; font-weight: 800; font-size: 15px; background: var(--accent); color: var(--ink); border: 0; border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+button.ghost { background: transparent; color: var(--paper); border: 2px solid var(--paper); }
+button:focus-visible { outline: 3px solid var(--paper); outline-offset: 3px; }
+.dots { display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; max-width: 420px; }
+.dots button { width: 14px; height: 14px; padding: 0; border-radius: 50%; background: #3a3550; }
+.dots button[aria-current="true"] { background: var(--accent); }
+.meta { font-size: 14px; color: var(--muted); text-align: center; }
+.bar-track { width: 100%; height: 6px; background: #3a3550; border-radius: 999px; overflow: hidden; }
+.bar-track > i { display: block; height: 100%; width: 0; background: var(--accent); }
+
+/* Video render mode: the 390px design fills 1080 × 1920 */
+body.render { width: 1080px; height: 1920px; padding: 0; gap: 0; overflow: hidden; align-items: flex-start; }
+body.render .phone { zoom: 2.7692; width: 390px; height: 693.33px; aspect-ratio: auto; max-width: none; border-radius: 0; box-shadow: none; }
+body.render .controls { display: none; }
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone" aria-live="polite"></div>
+
+<div class="controls">
+  <div class="bar-track" aria-hidden="true"><i id="bar"></i></div>
+  <div class="row">
+    <button id="play" type="button">▶ Play</button>
+    <button id="restart" type="button" class="ghost">↺ Restart</button>
+    <button id="sound" type="button" class="ghost" aria-pressed="true">Sound: on</button>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="meta" id="meta"></div>
+</div>
+
+<script>
+// Data for one article is injected by the renderer as window.__DATA__:
+// { card: <one card from docs/news.json>, logo: <data URI>, photo: <data URI> }
+const D = window.__DATA__;
+const CARD = D.card;
+const IG = CARD.instagram;
+const LOGO = D.logo, PHOTO = D.photo;
+const INK = '#14121F', PAPER = '#FFF7EC';
+if (window.__RENDER__) document.body.classList.add('render');
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const KR_CAT = { 'Politics & Society': '정치·사회', 'Business & Economy': '경제', 'Culture': '문화', 'Sports': '스포츠', 'Entertainment': '연예', 'World': '세계' };
+const SKINS = {
+  'Politics & Society': { main: '#E63946', fg: PAPER },
+  'Business & Economy': { main: '#14B8A6', fg: INK },
+  'Culture':            { main: '#FFD21F', fg: INK },
+  'Sports':             { main: '#FF8C1A', fg: INK },
+  'Entertainment':      { main: '#2F80FF', fg: PAPER },
+  'World':              { main: '#1FAD5B', fg: INK }
+};
+const category = SKINS[CARD.category] ? CARD.category : 'World';
+
+// Typing timing: English per letter, Korean 2.4x slower per syllable.
+const EN_MS = 45, KR_MS = 110, GAP_MS = 300, HOLD_MS = 1500;
+
+// Scenes come from the article's data: cover (with hook), then each slide
+// (a label card, its sentences typed in English and Korean, and a word card), then
+// the other words, then the author card. Cards marked card:true are the carousel stills.
+const scenes = [];
+scenes.push({ k: 'cover', dur: 6500, card: true,
+  kicker: `${CARD.category} · ${KR_CAT[CARD.category] || ''}`,
+  en: CARD.english_title, kr: CARD.korean_title,
+  hook_en: IG.hook_en, hook_kr: IG.hook_ko });
+(IG.slides || []).forEach((sl, i, all) => {
+  scenes.push({ k: 'trans', num: `${i + 1} / ${all.length}`, dur: 3500,
+    anim: ['anim-wipe', 'anim-pop', 'anim-drop'][i % 3], en: sl.label_en, kr: sl.label_ko });
+  (sl.en || []).forEach((en, j) => scenes.push({ k: 'type',
+    label: `${sl.label_en} · ${sl.label_ko}`, en, kr: (sl.ko || [])[j] || '' }));
+  scenes.push({ k: 'words', label: `${sl.label_en} · ${sl.label_ko} · 단어`,
+    words: sl.words || [], dur: 5000, card: true });
+});
+if (IG.counterpoint_en) scenes.push({ k: 'type', label: 'Another view · 다른 시각',
+  en: IG.counterpoint_en, kr: IG.counterpoint_ko || '' });
+if ((IG.other_words || []).length) scenes.push({ k: 'words', label: 'Other words · 다른 단어',
+  words: IG.other_words.map(w => ({ ko: w.ko, en: w.en, note: w.roman || '' })), dur: 5000, card: true });
+scenes.push({ k: 'end', dur: 7000, card: true });
+
+function typingMs(s) {
+  return [...s.en].length * EN_MS + GAP_MS + [...s.kr].length * KR_MS;
+}
+let cursor = 0;
+const timeline = scenes.map((s, i) => {
+  const need = s.k === 'type' ? typingMs(s) + HOLD_MS : 0;
+  const dur = Math.max(s.dur || 0, need);
+  const block = { i, start: cursor, end: cursor + dur, scene: s };
+  cursor += dur;
+  return block;
+});
+const TOTAL = cursor;
+window.__cards = timeline.filter(b => b.scene.card).map(b => b.i);
+
+const phone = document.getElementById('phone');
+const bar = document.getElementById('bar');
+const dotsEl = document.getElementById('dots');
+const playBtn = document.getElementById('play');
+const restartBtn = document.getElementById('restart');
+const soundBtn = document.getElementById('sound');
+document.getElementById('meta').textContent = `${CARD.english_title} · about ${Math.round(TOTAL / 1000)} seconds`;
+
+let t = 0, playing = false, lastFrame = 0, lastRenderedScene = -1;
+let lastCounts = { en: -1, kr: -1 };
+let soundOn = true, audioCtx = null;
+
+timeline.forEach((b, idx) => {
+  const d = document.createElement('button');
+  d.type = 'button';
+  d.setAttribute('aria-label', `Jump to scene ${idx + 1}`);
+  d.addEventListener('click', () => { t = b.start; lastRenderedScene = -1; playing = false; updatePlayButton(); render(); });
+  dotsEl.appendChild(d);
+});
+
+function updatePlayButton() {
+  playBtn.textContent = playing ? '❚❚ Pause' : (t >= TOTAL ? '↺ Replay' : '▶ Play');
+}
+
+// Sound (preview only; the downloadable video gets the same sounds from window.__events)
+function tone(freq, dur, gainVal, type = 'square', when = 0) {
+  if (!soundOn || !audioCtx) return;
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  const t0 = audioCtx.currentTime + when;
+  osc.type = type; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(gainVal, t0);
+  gain.gain.exponentialRampToValueAtTime(0.0005, t0 + dur);
+  osc.connect(gain).connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0 + dur + 0.02);
+}
+function click() { tone(1800 + Math.random() * 400, 0.025, 0.05, 'square'); }
+function introSound() {
+  tone(262, 2.4, 0.10, 'triangle', 0); tone(330, 2.4, 0.10, 'triangle', 0.25);
+  tone(392, 2.4, 0.10, 'triangle', 0.5); tone(523, 2.2, 0.12, 'triangle', 0.8);
+  tone(784, 1.6, 0.08, 'sine', 1.2); tone(98, 1.2, 0.25, 'sine', 0);
+}
+function transSound() {
+  [262, 330, 392].forEach(f => tone(f, 1.8, 0.035, 'sine', 0));
+  [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.55, 0.08, 'triangle', 0.12 + i * 0.22));
+}
+
+// Every sound in the video, with its time in ms. The renderer turns these into the audio track.
+window.__events = () => {
+  const ev = [];
+  timeline.forEach(b => {
+    const s = b.scene, S = b.start;
+    if (s.k === 'cover') ev.push({ t: S, k: 'intro' });
+    if (s.k === 'trans') ev.push({ t: S, k: 'trans' });
+    if (s.k !== 'type') return;
+    const en = [...s.en], kr = [...s.kr];
+    for (let k = 1; k <= en.length; k++) ev.push({ t: S + k * EN_MS, k: 'click' });
+    const krStart = en.length * EN_MS + GAP_MS;
+    for (let k = 1; k <= kr.length; k++) ev.push({ t: S + krStart + k * KR_MS, k: 'click' });
+  });
+  return ev;
+};
+
+function topbar(el) {
+  const top = document.createElement('div');
+  top.className = 'topbar';
+  top.innerHTML = `<span class="brand"><span class="pill"><img src="${LOGO}" alt="What the! logo"></span> Maeil News · 매일 뉴스</span><span class="topic">${esc(category)}</span>`;
+  el.appendChild(top);
+}
+
+// Memory chip picture for the cover. Drawn the same way for every article.
+function chipArt() {
+  return `<svg class="cover-art" viewBox="0 0 200 130" aria-hidden="true">
+    <g fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round">
+      <path class="pin" pathLength="1" style="animation-delay:150ms" d="M70 10V22 M90 10V22 M110 10V22 M130 10V22"/>
+      <path class="pin" pathLength="1" style="animation-delay:150ms" d="M70 108V120 M90 108V120 M110 108V120 M130 108V120"/>
+      <path class="pin" pathLength="1" style="animation-delay:300ms" d="M28 40H50 M28 60H50 M28 80H50 M172 40H150 M172 60H150 M172 80H150"/>
+    </g>
+    <rect class="body" x="50" y="22" width="100" height="86" rx="10" fill="${PAPER}" stroke="${INK}" stroke-width="4"/>
+    <rect class="bar" style="animation-delay:700ms" x="68" y="72" width="14" height="26" rx="3" fill="${INK}"/>
+    <rect class="bar" style="animation-delay:850ms" x="88" y="58" width="14" height="40" rx="3" fill="${INK}"/>
+    <rect class="bar" style="animation-delay:1000ms" x="108" y="44" width="14" height="54" rx="3" fill="${INK}"/>
+    <rect class="bar" style="animation-delay:1150ms" x="128" y="30" width="8" height="68" rx="3" fill="#FF4FA3"/>
+  </svg>`;
+}
+
+function buildScene(block) {
+  const s = block.scene;
+  const sk = SKINS[category];
+  phone.innerHTML = '';
+  const el = document.createElement('div');
+  el.className = 'scene';
+  el.style.setProperty('--bg', sk.main);
+  el.style.setProperty('--fg', sk.fg);
+  topbar(el);
+
+  if (s.k === 'cover') {
+    const kick = document.createElement('div'); kick.className = 'cover-kicker'; kick.textContent = s.kicker;
+    const art = document.createElement('div'); art.innerHTML = chipArt();
+    const en = document.createElement('div'); en.className = 'cover-en';
+    s.en.split(' ').forEach((word, i, arr) => {
+      const w = document.createElement('span');
+      w.className = 'w';
+      w.style.animationDelay = `${400 + i * 110}ms`;
+      w.textContent = word;
+      en.appendChild(w);
+      if (i < arr.length - 1) en.appendChild(document.createTextNode(' '));
+    });
+    const kr = document.createElement('div'); kr.className = 'cover-kr'; kr.textContent = s.kr;
+    const hook = document.createElement('div'); hook.className = 'cover-hook';
+    hook.innerHTML = `<b>${esc(s.hook_en)}</b><small>${esc(s.hook_kr)}</small>`;
+    el.append(kick, art, en, kr, hook);
+  } else if (s.k === 'type') {
+    const card = document.createElement('div'); card.className = 'card';
+    const lab = document.createElement('div'); lab.className = 'label'; lab.textContent = s.label;
+    const en = document.createElement('div'); en.className = 'en'; en.id = 'typeEn';
+    const kr = document.createElement('div'); kr.className = 'kr'; kr.id = 'typeKr';
+    card.append(lab, en, kr);
+    el.appendChild(card);
+  } else if (s.k === 'trans') {
+    const n = document.createElement('div'); n.className = `trans-num ${s.anim}`; n.textContent = s.num;
+    const w = document.createElement('div'); w.className = `trans-word ${s.anim}`; w.textContent = s.en;
+    const k = document.createElement('div'); k.className = `trans-kr ${s.anim}`; k.textContent = s.kr;
+    el.append(n, w, k);
+  } else if (s.k === 'words') {
+    const card = document.createElement('div'); card.className = 'card words-card';
+    const lab = document.createElement('div'); lab.className = 'label'; lab.textContent = s.label;
+    const grid = document.createElement('div'); grid.className = 'word-grid';
+    s.words.slice(0, 8).forEach((w, i) => {
+      const c = document.createElement('div'); c.className = 'word';
+      c.style.animationDelay = `${i * 120}ms`;
+      c.innerHTML = `<b>${esc(w.ko)}</b><span>${esc(w.en)}</span>${w.note ? `<small>${esc(w.note)}</small>` : ''}`;
+      grid.appendChild(c);
+    });
+    card.append(lab, grid);
+    el.appendChild(card);
+  } else if (s.k === 'end') {
+    const card = document.createElement('div'); card.className = 'card';
+    const credit = document.createElement('div'); credit.className = 'credit';
+    credit.innerHTML = `<img class="photo" src="${PHOTO}" alt="Photo of Deevena Angel Thirupathi"><div class="who">Edited by Deevena Angel Thirupathi<small>디웨나 엔젤 티루파티 · 매일 뉴스 편집</small></div>`;
+    const host = (() => { try { return new URL(CARD.link).hostname.replace(/^www\./, ''); } catch { return ''; } })();
+    const src = document.createElement('div'); src.className = 'src';
+    src.innerHTML = `Source: ${esc(CARD.source)}${host ? ' · ' + esc(host) : ''}`;
+    const srcKr = document.createElement('div'); srcKr.className = 'src-kr';
+    srcKr.textContent = `출처: ${CARD.source} · 원문 링크에서 확인하세요`;
+    const handle = document.createElement('div'); handle.className = 'label'; handle.textContent = '@deevena_angel_thirupathi';
+    card.append(credit, src, srcKr, handle);
+    el.appendChild(card);
+  }
+  phone.appendChild(el);
+  lastCounts = { en: -1, kr: -1 };
+}
+
+function render() {
+  const block = timeline.find(b => t >= b.start && t < b.end) || timeline[timeline.length - 1];
+  if (t >= TOTAL) t = TOTAL;
+
+  if (block.i !== lastRenderedScene) {
+    buildScene(block);
+    if (block.scene.k === 'cover') introSound();
+    if (block.scene.k === 'trans') transSound();
+    lastRenderedScene = block.i;
+    [...dotsEl.children].forEach((c, n) => {
+      if (n === block.i) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current');
+    });
+  }
+
+  const local = t - block.start;
+  const s = block.scene;
+  if (s.k === 'type') {
+    const enChars = [...s.en];
+    const krChars = [...s.kr];
+    const enCount = Math.min(enChars.length, Math.floor(local / EN_MS));
+    const krStart = enChars.length * EN_MS + GAP_MS;
+    const krCount = local < krStart ? 0 : Math.min(krChars.length, Math.floor((local - krStart) / KR_MS));
+    const enEl = document.getElementById('typeEn');
+    const krEl = document.getElementById('typeKr');
+    if (enEl && enCount !== lastCounts.en) {
+      enEl.textContent = enChars.slice(0, enCount).join('');
+      enEl.classList.toggle('caret', enCount < enChars.length);
+      lastCounts.en = enCount;
+    }
+    if (krEl && krCount !== lastCounts.kr) {
+      krEl.textContent = krChars.slice(0, krCount).join('');
+      krEl.classList.toggle('caret', krCount > 0 && krCount < krChars.length);
+      lastCounts.kr = krCount;
+    }
+  }
+  bar.style.width = `${(t / TOTAL) * 100}%`;
+}
+
+function frame(now) {
+  if (playing) {
+    const dt = Math.min(64, now - lastFrame);
+    t += dt;
+    if (t >= TOTAL) { t = TOTAL; playing = false; updatePlayButton(); }
+  }
+  lastFrame = now;
+  render();
+  requestAnimationFrame(frame);
+}
+
+function ensureAudio() {
+  if (!audioCtx && window.AudioContext) {
+    try { audioCtx = new AudioContext(); } catch (e) { audioCtx = null; }
+  }
+}
+
+playBtn.addEventListener('click', () => {
+  ensureAudio();
+  if (t >= TOTAL) { t = 0; lastRenderedScene = -1; }
+  playing = !playing;
+  updatePlayButton();
+});
+restartBtn.addEventListener('click', () => { ensureAudio(); t = 0; lastRenderedScene = -1; playing = true; updatePlayButton(); });
+soundBtn.addEventListener('click', () => {
+  soundOn = !soundOn;
+  if (soundOn) ensureAudio();
+  soundBtn.textContent = `Sound: ${soundOn ? 'on' : 'off'}`;
+  soundBtn.setAttribute('aria-pressed', String(soundOn));
+});
+
+requestAnimationFrame(now => { lastFrame = now; requestAnimationFrame(frame); });
+updatePlayButton();
+</script>
+</body>
+</html>
