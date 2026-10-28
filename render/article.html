@@ -45,6 +45,12 @@ body {
 .anim-drop { animation: drop 700ms cubic-bezier(.2,.9,.3,1) both; }
 .anim-fade { animation: fade 900ms ease-out both; }
 @keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.brand-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 0 7%; }
+.brand-logo { background: var(--paper); border-radius: 999px; padding: 10px 18px; display: inline-flex; align-items: center; animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; }
+.brand-logo img { height: 52px; width: auto; display: block; }
+.brand-name { font-size: 52px; font-weight: 800; line-height: 1; animation: pop 800ms cubic-bezier(.2,1.4,.4,1) 300ms both; }
+.brand-kr { font-family: var(--font-kr); font-size: 24px; font-weight: 700; animation: fade 800ms ease-out 700ms both; }
+.brand-tag { font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; animation: fade 800ms ease-out 1100ms both; }
 @keyframes pop { from { transform: scale(.6) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes drop { from { transform: translateY(-60px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fade { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
@@ -158,6 +164,7 @@ if (IG.counterpoint_en) scenes.push({ k: 'type', label: 'Another view · 다른 
 if ((IG.other_words || []).length) scenes.push({ k: 'words', label: 'Other words · 다른 단어',
   words: IG.other_words.map(w => ({ ko: w.ko, en: w.en, note: w.roman || '' })), dur: 5000, card: true });
 scenes.push({ k: 'end', dur: 7000, card: true });
+scenes.push({ k: 'brand', dur: 4500 });
 
 function typingMs(s) {
   return [...s.en].length * EN_MS + GAP_MS + [...s.kr].length * KR_MS;
@@ -214,6 +221,12 @@ function introSound() {
   tone(392, 2.4, 0.10, 'triangle', 0.5); tone(523, 2.2, 0.12, 'triangle', 0.8);
   tone(784, 1.6, 0.08, 'sine', 1.2); tone(98, 1.2, 0.25, 'sine', 0);
 }
+// Brand sound: the same short signature motif that closes every video.
+function brandSound() {
+  tone(784, 0.18, 0.12, 'triangle', 0); tone(988, 0.18, 0.12, 'triangle', 0.16); tone(1175, 0.18, 0.12, 'triangle', 0.32);
+  tone(1568, 0.6, 0.14, 'triangle', 0.5); tone(392, 1.2, 0.05, 'sine', 0.5);
+}
+
 function transSound() {
   [262, 330, 392].forEach(f => tone(f, 1.8, 0.035, 'sine', 0));
   [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.55, 0.08, 'triangle', 0.12 + i * 0.22));
@@ -226,6 +239,7 @@ window.__events = () => {
     const s = b.scene, S = b.start;
     if (s.k === 'cover') ev.push({ t: S, k: 'intro' });
     if (s.k === 'trans') ev.push({ t: S, k: 'trans' });
+    if (s.k === 'brand') ev.push({ t: S, k: 'brand' });
     if (s.k !== 'type') return;
     const en = [...s.en], kr = [...s.kr];
     for (let k = 1; k <= en.length; k++) ev.push({ t: S + k * EN_MS, k: 'click' });
@@ -266,7 +280,7 @@ function buildScene(block) {
   el.className = 'scene';
   el.style.setProperty('--bg', sk.main);
   el.style.setProperty('--fg', sk.fg);
-  topbar(el);
+  if (s.k !== 'brand') topbar(el);
 
   if (s.k === 'cover') {
     const kick = document.createElement('div'); kick.className = 'cover-kicker'; kick.textContent = s.kicker;
@@ -308,6 +322,13 @@ function buildScene(block) {
     });
     card.append(lab, grid);
     el.appendChild(card);
+  } else if (s.k === 'brand') {
+    const wrap = document.createElement('div'); wrap.className = 'brand-wrap';
+    wrap.innerHTML = `<div class="brand-logo"><img src="${LOGO}" alt="What the! logo"></div>
+      <div class="brand-name">Maeil News</div>
+      <div class="brand-kr">매일 뉴스 · 한국어로 읽는 오늘의 뉴스</div>
+      <div class="brand-tag">Today's news, learned in Korean</div>`;
+    el.appendChild(wrap);
   } else if (s.k === 'end') {
     const card = document.createElement('div'); card.className = 'card';
     const credit = document.createElement('div'); credit.className = 'credit';
@@ -333,6 +354,7 @@ function render() {
     buildScene(block);
     if (block.scene.k === 'cover') introSound();
     if (block.scene.k === 'trans') transSound();
+    if (block.scene.k === 'brand') brandSound();
     lastRenderedScene = block.i;
     [...dotsEl.children].forEach((c, n) => {
       if (n === block.i) c.setAttribute('aria-current', 'true'); else c.removeAttribute('aria-current');
