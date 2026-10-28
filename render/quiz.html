@@ -83,6 +83,12 @@ body {
 .cover-en { font-size: 40px; font-weight: 800; line-height: 1.08; text-wrap: balance; }
 .cover-en .w { display: inline-block; opacity: 0; animation: rise 520ms ease-out both; }
 .cover-kr { font-family: var(--font-kr); font-size: 22px; font-weight: 700; line-height: 1.4; opacity: 0; animation: fade 700ms ease-out 2000ms both; }
+.brand-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 0 7%; }
+.brand-logo { background: var(--paper); border-radius: 999px; padding: 10px 18px; display: inline-flex; align-items: center; animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; }
+.brand-logo img { height: 52px; width: auto; display: block; }
+.brand-name { font-size: 52px; font-weight: 800; line-height: 1; animation: pop 800ms cubic-bezier(.2,1.4,.4,1) 300ms both; }
+.brand-kr { font-family: var(--font-kr); font-size: 24px; font-weight: 700; animation: fade 800ms ease-out 700ms both; }
+.brand-tag { font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; animation: fade 800ms ease-out 1100ms both; }
 @keyframes draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes rise { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
 @keyframes pop { from { transform: scale(.6) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -174,6 +180,7 @@ QUIZ.forEach((q, i) => {
     scenes.push({ k: 'remark', q, n, text: q.remark || { en: '', kr: '' }, dur: REMARK_MS });
   }
 });
+scenes.push({ k: 'brand', dur: 4500 });
 
 function typeEndMs(q) {
   return [...q.q_en].length * EN_MS + GAP_MS + [...q.q_kr].length * KR_MS;
@@ -236,6 +243,12 @@ function chime() {
   tone(523, 0.18, 0.12, 'triangle', 0); tone(659, 0.18, 0.12, 'triangle', 0.14); tone(784, 0.45, 0.14, 'triangle', 0.28);
 }
 
+// Brand sound: a short signature motif that closes every quiz.
+function brandSound() {
+  tone(784, 0.18, 0.12, 'triangle', 0); tone(988, 0.18, 0.12, 'triangle', 0.16); tone(1175, 0.18, 0.12, 'triangle', 0.32);
+  tone(1568, 0.6, 0.14, 'triangle', 0.5); tone(392, 1.2, 0.05, 'sine', 0.5);
+}
+
 // Every sound in the video, with its time in ms. The renderer turns these into the audio track.
 window.__events = () => {
   const ev = [];
@@ -243,6 +256,7 @@ window.__events = () => {
     const s = b.scene, S = b.start;
     if (s.k === 'cover') ev.push({ t: S, k: 'intro' });
     if (s.k === 'reveal') ev.push({ t: S, k: 'chime' });
+    if (s.k === 'brand') ev.push({ t: S, k: 'brand' });
     if (s.k !== 'question') return;
     const q = s.q;
     const en = [...q.q_en], kr = [...q.q_kr];
@@ -368,6 +382,13 @@ function buildScene(block) {
     const why = document.createElement('div'); why.className = 'why';
     why.innerHTML = `<div class="label">Why · 이유</div><p>${esc(q.why_en)}</p><small>${esc(q.why_kr)}</small>`;
     el.append(progressRow(s.n), head, badge, ans, why);
+  } else if (s.k === 'brand') {
+    const wrap = document.createElement('div'); wrap.className = 'brand-wrap';
+    wrap.innerHTML = `<div class="brand-logo"><img src="${LOGO}" alt="What the! logo"></div>
+      <div class="brand-name">Maeil News</div>
+      <div class="brand-kr">매일 뉴스 · 한국어로 읽는 오늘의 뉴스</div>
+      <div class="brand-tag">Today's news, learned in Korean</div>`;
+    el.appendChild(wrap);
   } else if (s.k === 'remark') {
     const big = document.createElement('div'); big.className = 'remark-en'; big.textContent = s.text.en;
     const kr = document.createElement('div'); kr.className = 'remark-kr'; kr.textContent = s.text.kr;
@@ -389,6 +410,7 @@ function render() {
   if (block.i !== lastRenderedScene) {
     buildScene(block);
     if (block.scene.k === 'reveal') chime();
+    if (block.scene.k === 'brand') brandSound();
     if (block.scene.k === 'cover') introSound();
     lastRenderedScene = block.i;
     [...dotsEl.children].forEach((c, n) => {

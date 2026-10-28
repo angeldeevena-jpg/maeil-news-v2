@@ -74,6 +74,10 @@ function synth(events, offsetS, totalS) {
       [[262, 2.4, 0.10, 'triangle', 0], [330, 2.4, 0.10, 'triangle', 0.25], [392, 2.4, 0.10, 'triangle', 0.5],
        [523, 2.2, 0.12, 'triangle', 0.8], [784, 1.6, 0.08, 'sine', 1.2], [98, 1.2, 0.25, 'sine', 0]]
         .forEach(([f, d, g, w, o]) => tone(t0 + o, f, d, g, w));
+    } else if (e.k === 'brand') {
+      [[784, 0.18, 0.12, 'triangle', 0], [988, 0.18, 0.12, 'triangle', 0.16], [1175, 0.18, 0.12, 'triangle', 0.32],
+       [1568, 0.6, 0.14, 'triangle', 0.5], [392, 1.2, 0.05, 'sine', 0.5]]
+        .forEach(([f, d, g, w, o]) => tone(t0 + o, f, d, g, w));
     } else if (e.k === 'trans') {
       [262, 330, 392].forEach((f) => tone(t0, f, 1.8, 0.035, 'sine'));
       [523, 659, 784, 1047].forEach((f, i) => tone(t0 + 0.12 + i * 0.22, f, 0.55, 0.08, 'triangle'));
