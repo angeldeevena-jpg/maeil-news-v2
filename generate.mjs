@@ -138,6 +138,8 @@ const SYSTEM = `You write for a Korean-learning news app. For each numbered news
 {"cards":[{
   "index": number,
   "korean_title": "natural Korean headline, under 30 characters",
+  "gist_en": "one complete English news headline sentence giving the gist of the story, under 20 words",
+  "gist_ko": "the same gist as one complete, natural Korean news sentence, polite style",
   "title_words": [{"ko": "word as it appears in korean_title", "roman": "romanization", "en": "short English meaning"}],
   "summary": [
     {"en": "one English sentence from the article, exactly 5 in story order",
@@ -255,6 +257,8 @@ if (status !== 'off') {
         published: item.published,
         english_title: item.title,
         korean_title: t.korean_title || '',
+        gist_en: t.gist_en || '',
+        gist_ko: t.gist_ko || '',
         title_words: t.title_words || [],
         summary: t.summary || [],
         // Instagram slides, save cards and video: Korean articles only

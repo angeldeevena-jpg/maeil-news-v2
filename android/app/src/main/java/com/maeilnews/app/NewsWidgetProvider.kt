@@ -215,8 +215,9 @@ class NewsWidgetProvider : AppWidgetProvider() {
             if (card != null) {
                 val position = wrap(currentIndex(context), cards.size) + 1
                 views.setTextViewText(R.id.category, "${card.category} · $position / ${cards.size}")
-                views.setTextViewText(R.id.headline, card.englishTitle)
-                views.setTextViewText(R.id.headline_kr, card.koreanTitle)
+                // The gist: one news sentence in English and Korean (falls back to the headline for older articles)
+                views.setTextViewText(R.id.headline, card.gistEn.ifBlank { card.englishTitle })
+                views.setTextViewText(R.id.headline_kr, card.gistKo.ifBlank { card.koreanTitle })
                 views.setViewVisibility(R.id.save, if (card.saveAllowed) View.VISIBLE else View.GONE)
                 views.setOnClickPendingIntent(R.id.card, activity(context, DetailActivity::class.java, card.id))
                 renderWords(context, views, card)

@@ -37,7 +37,7 @@
                 <ImageView
                     android:id="@+id/logo"
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
+                    android:layout_height="36dp"
                     android:adjustViewBounds="true"
                     android:contentDescription="What the! logo"
                     android:src="@drawable/logo" />
@@ -76,39 +76,39 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:text="KR"
                 android:textColor="#FFFFF8EE"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/chip_indian"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:text="IN"
                 android:textColor="#FFFFF8EE"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/chip_global"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:maxLines="1"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:text="World"
                 android:textColor="#FFFFF8EE"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -180,7 +180,7 @@
                 android:maxLines="3"
                 android:ellipsize="end"
                 android:textColor="#FF1F1A17"
-                android:textSize="22sp"
+                android:textSize="19sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -192,7 +192,7 @@
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:textColor="#FF1F1A17"
-                android:textSize="17sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <!-- Empty spacer; plain View is not allowed inside home-screen widgets, FrameLayout is -->

@@ -26,7 +26,10 @@ data class Card(
     val titleWords: List<Word>,
     val summary: List<SummaryItem>,
     val saveAllowed: Boolean,
-    val media: Media?
+    val media: Media?,
+    /** One complete news sentence giving the gist, in English and Korean (empty for older articles). */
+    val gistEn: String = "",
+    val gistKo: String = ""
 )
 
 data class NewsSet(val date: String, val note: String, val cards: List<Card>)
@@ -120,7 +123,9 @@ object NewsStore {
             titleWords = parseWords(o.optJSONArray("title_words")),
             summary = summary,
             saveAllowed = o.optBoolean("save_allowed", false),
-            media = parseMedia(o.optJSONObject("media"))
+            media = parseMedia(o.optJSONObject("media")),
+            gistEn = o.optString("gist_en"),
+            gistKo = o.optString("gist_ko")
         )
     }
 
