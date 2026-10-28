@@ -236,6 +236,10 @@ class NewsWidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.word_bank_arrow, if (inWords) "" else "→")
             views.setOnClickPendingIntent(R.id.word_bank, broadcast(context, ACTION_WORD_BANK))
 
+            // Word bank open: the next arrow turns yellow, as on the design board
+            views.setInt(R.id.next, "setBackgroundResource", if (inWords) R.drawable.circle_yellow else R.drawable.circle_dark)
+            views.setTextColor(R.id.next, if (inWords) Color.parseColor("#FF1F1A17") else Color.parseColor("#FFFFF8EE"))
+
             views.setOnClickPendingIntent(R.id.header_left, broadcast(context, ACTION_REFRESH))
             views.setOnClickPendingIntent(R.id.prev, broadcast(context, ACTION_PREV))
             views.setOnClickPendingIntent(R.id.next, broadcast(context, ACTION_NEXT))
