@@ -137,10 +137,9 @@ const price = config.price_per_million_tokens;
 const SYSTEM = `You write for a Korean-learning news app. For each numbered news item (English headline, article text, and needs_instagram), return JSON:
 {"cards":[{
   "index": number,
-  "korean_title": "natural Korean headline, under 30 characters",
   "gist_en": "one complete English news headline sentence giving the gist of the story, under 20 words",
-  "gist_ko": "the same gist as one complete, natural Korean news sentence, polite style",
-  "title_words": [{"ko": "word as it appears in korean_title", "roman": "romanization", "en": "short English meaning"}],
+  "gist_ko": "an exact Korean translation of gist_en, as one complete natural news sentence in polite style: the same facts, names and numbers, nothing added and nothing left out",
+  "title_words": [{"ko": "word as it appears in gist_ko", "roman": "romanization", "en": "short English meaning"}],
   "summary": [
     {"en": "one English sentence from the article, exactly 5 in story order",
      "ko": "natural Korean translation of that sentence, polite style (-요/-습니다)",
@@ -256,7 +255,8 @@ if (status !== 'off') {
         link: item.link,
         published: item.published,
         english_title: item.title,
-        korean_title: t.korean_title || '',
+        // The Korean shown in the widget, the word bank and the glossary is the same sentence as the English gist
+        korean_title: t.gist_ko || '',
         gist_en: t.gist_en || '',
         gist_ko: t.gist_ko || '',
         title_words: t.title_words || [],

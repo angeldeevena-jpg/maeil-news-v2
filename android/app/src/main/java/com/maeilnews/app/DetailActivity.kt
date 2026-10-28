@@ -58,7 +58,7 @@ class DetailActivity : Activity() {
         topRow.addView(
             pill("Search on Google → 구글 검색", dark, yellow, 14f, dp(16), dp(12)).apply {
                 setOnClickListener {
-                    val query = URLEncoder.encode(card.koreanTitle, "UTF-8")
+                    val query = URLEncoder.encode(card.englishTitle, "UTF-8")
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/search?q=$query")))
                 }
             },
@@ -88,14 +88,14 @@ class DetailActivity : Activity() {
         }
         card.summary.forEachIndexed { i, s ->
             val n = i + 1
-            list.addView(sentence(n, s.en, s.ko, last = i == card.summary.size - 1), matchWrap())
+            list.addView(sentence(n, s.en, s.ko, s.words, last = i == card.summary.size - 1), matchWrap())
         }
         root.addView(ScrollView(this).apply { addView(list) }, LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f
         ))
     }
 
-    private fun sentence(n: Int, en: String, ko: String, last: Boolean): LinearLayout {
+    private fun sentence(n: Int, en: String, ko: String, words: List<Word>, last: Boolean): LinearLayout {
         val block = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, 0, 0, dp(12))
@@ -128,6 +128,15 @@ class DetailActivity : Activity() {
         block.addView(koRow, matchWrap(top = 4))
 
         block.addView(text(ko, 15f, cream, false, korean = true, lineHeight = 1.45f), matchWrap(top = 6))
+
+        // Glossary: every word of this Korean sentence, with its meaning
+        if (words.isNotEmpty()) {
+            block.addView(text("Glossary · 단어", 12f, yellow, true).apply { letterSpacing = 0.05f }, matchWrap(top = 10))
+            words.forEach { w ->
+                val roman = if (w.roman.isBlank()) "" else " (${w.roman})"
+                block.addView(text("${w.ko}$roman — ${w.en}", 14f, cream, false, korean = true, lineHeight = 1.35f), matchWrap(top = 3))
+            }
+        }
 
         val container = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         container.addView(block, matchWrap())
