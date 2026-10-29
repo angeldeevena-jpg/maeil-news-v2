@@ -156,9 +156,10 @@ const SYSTEM = `You write for a Korean-learning news app. For each numbered news
      ],
      "other_words": [up to 6 {"ko": "word", "roman": "romanization", "en": "meaning"}, words not already used in the slides],
      "counterpoint_en": "one sentence giving a different view, only if the article itself gives one, otherwise empty",
-     "counterpoint_ko": "Korean of the counterpoint, or empty"}
+     "counterpoint_ko": "Korean of the counterpoint, or empty",
+     "glossary": [exactly 5 important words taken from the Korean slides, each {"ko": "the word exactly as written in the Korean text, with its grammar attached, e.g. 정부가", "en": "short English meaning of the word", "sentence_en": "one short English sentence that contains the Korean word exactly as written in ko, with its Korean grammar attached, e.g. The 정부가 announced a new plan.", "sentence_ko": "one short Korean sentence in polite style that contains the word exactly as written in ko"}]}
 }]}
-Rules: exactly 5 summary items. Facts must match the article; do not add facts. Use only what is in the article text; if the text is missing, use the headline and keep to what it states. Return only JSON.`;
+Rules: exactly 5 summary items. Glossary: exactly 5 entries, each a word that appears in the Korean slides. Facts must match the article; do not add facts. Use only what is in the article text; if the text is missing, use the headline and keep to what it states. Return only JSON.`;
 
 async function translateBatch(items) {
   const body = {

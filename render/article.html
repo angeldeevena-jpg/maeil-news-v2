@@ -25,10 +25,10 @@ body {
 }
 .scene { position: absolute; inset: 0; padding: 16% 7% 5%; display: flex; flex-direction: column; justify-content: center; gap: 12px; color: var(--fg); background: var(--bg); }
 .scene > * { flex-shrink: 0; }
-.topbar { position: absolute; top: 4%; left: 7%; right: 7%; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--fg); }
+.topbar { position: absolute; top: 7%; left: 7%; right: 7%; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--fg); }
 .brand { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
 .pill { background: var(--paper); border-radius: 999px; padding: 4px 9px; display: inline-flex; align-items: center; }
-.pill img { height: 14px; width: auto; display: block; }
+.pill img { height: 18px; width: auto; display: block; }
 .topic { opacity: .85; text-align: right; }
 
 .card { background: var(--paper); color: var(--ink); border-radius: 20px; padding: 20px 18px 22px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 6px 0 rgba(20,18,31,.18); }
@@ -45,6 +45,13 @@ body {
 .anim-drop { animation: drop 700ms cubic-bezier(.2,.9,.3,1) both; }
 .anim-fade { animation: fade 900ms ease-out both; }
 @keyframes wipe { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+.gl { gap: 10px; }
+.gl-row { background: var(--paper); color: var(--ink); border-radius: 14px; padding: 9px 12px; display: flex; flex-direction: column; gap: 3px; opacity: 0; animation: fade 500ms ease-out both; }
+.gl-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.gl-ko { font-family: var(--font-kr); font-size: 19px; font-weight: 800; }
+.gl-en { font-size: 13px; font-weight: 800; }
+.gl-sen { font-size: 12.5px; line-height: 1.35; opacity: .85; }
+.gl-sen-kr { font-family: var(--font-kr); font-size: 13px; font-weight: 700; line-height: 1.4; }
 .brand-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 0 7%; }
 .brand-logo { background: var(--paper); border-radius: 999px; padding: 10px 18px; display: inline-flex; align-items: center; animation: pop 700ms cubic-bezier(.2,1.4,.4,1) both; }
 .brand-logo img { height: 52px; width: auto; display: block; }
@@ -163,6 +170,7 @@ if (IG.counterpoint_en) scenes.push({ k: 'type', label: 'Another view · 다른 
   en: IG.counterpoint_en, kr: IG.counterpoint_ko || '' });
 if ((IG.other_words || []).length) scenes.push({ k: 'words', label: 'Other words · 다른 단어',
   words: IG.other_words.map(w => ({ ko: w.ko, en: w.en, note: w.roman || '' })), dur: 5000, card: true });
+if ((IG.glossary || []).length) scenes.push({ k: 'glossary', items: IG.glossary.slice(0, 5), dur: 9000 });
 scenes.push({ k: 'end', dur: 7000, card: true });
 scenes.push({ k: 'brand', dur: 4500 });
 
@@ -321,6 +329,17 @@ function buildScene(block) {
       grid.appendChild(c);
     });
     card.append(lab, grid);
+    el.appendChild(card);
+  } else if (s.k === 'glossary') {
+    const card = document.createElement('div'); card.className = 'card gl';
+    const lab = document.createElement('div'); lab.className = 'label'; lab.textContent = 'Glossary · 단어 목록';
+    card.append(lab);
+    s.items.forEach((w, i) => {
+      const row = document.createElement('div'); row.className = 'gl-row';
+      row.style.animationDelay = `${300 + i * 350}ms`;
+      row.innerHTML = `<div class="gl-top"><b class="gl-ko">${esc(w.ko)}</b><span class="gl-en">${esc(w.en)}</span></div><div class="gl-sen">${esc(w.sentence_en)}</div><div class="gl-sen-kr">${esc(w.sentence_ko || '')}</div>`;
+      card.append(row);
+    });
     el.appendChild(card);
   } else if (s.k === 'brand') {
     const wrap = document.createElement('div'); wrap.className = 'brand-wrap';
