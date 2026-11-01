@@ -1,0 +1,328 @@
+{
+  "week": "2026-W44",
+  "generated_at": "2026-11-01T07:43:30.307Z",
+  "based_on_days": [
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29",
+    "2026-10-30",
+    "2026-10-31",
+    "2026-11-01"
+  ],
+  "intro": {
+    "en": "7 questions and a bonus. 7 seconds each.",
+    "kr": "7문제와 보너스 1문제. 문제당 7초."
+  },
+  "questions": [
+    {
+      "level": 1,
+      "level_label": "Easy · 쉬움",
+      "bonus": false,
+      "category": "Politics & Society",
+      "region": "korean",
+      "question_en": "How many diplomatic personnel did South Korea withdraw from Ukraine?",
+      "question_ko": "한국은 우크라이나에서 외교 인력을 몇 명 철수시켰나요?",
+      "options": [
+        {
+          "en": "8",
+          "ko": "8명"
+        },
+        {
+          "en": "5",
+          "ko": "5명"
+        },
+        {
+          "en": "12",
+          "ko": "12명"
+        },
+        {
+          "en": "20",
+          "ko": "20명"
+        }
+      ],
+      "answer": 0,
+      "why_en": "The headline says South Korea withdrew 8 diplomatic personnel from Ukraine.",
+      "why_kr": "헤드라인에 따르면 한국은 우크라이나에서 외교 인력 8명을 철수시켰습니다.",
+      "remark": {
+        "en": "Nice warm-up! Keep your quiz muscles flexing.",
+        "kr": "좋은 출발이에요! 퀴즈 근육을 계속 풀어 주세요."
+      },
+      "source": {
+        "title": "S. Korea withdraws 8 diplomatic personnel from Ukraine: FM Cho",
+        "link": "https://www.koreaherald.com/article/10916573"
+      }
+    },
+    {
+      "level": 2,
+      "level_label": "Easy · 쉬움",
+      "bonus": false,
+      "category": "Culture",
+      "region": "korean",
+      "question_en": "What record did Korea surpass with more than two months still left in the year?",
+      "question_ko": "한국은 연말까지 두 달 이상 남은 시점에 어떤 기록을 넘어섰나요?",
+      "options": [
+        {
+          "en": "The annual record for domestic movie sales",
+          "ko": "국내 영화 판매 연간 기록"
+        },
+        {
+          "en": "The annual record for foreign tourist arrivals",
+          "ko": "외국인 관광객 연간 방문 기록"
+        },
+        {
+          "en": "The annual record for overseas travelers",
+          "ko": "해외 여행객 연간 기록"
+        },
+        {
+          "en": "The annual record for hotel bookings",
+          "ko": "호텔 예약 연간 기록"
+        }
+      ],
+      "answer": 1,
+      "why_en": "Korea surpassed its annual record for foreign tourist arrivals.",
+      "why_kr": "한국은 외국인 관광객 연간 방문 기록을 넘어섰습니다.",
+      "remark": {
+        "en": "Two down—your news radar is warming up nicely.",
+        "kr": "두 문제 완료! 뉴스 레이더가 제법 잘 작동하네요."
+      },
+      "source": {
+        "title": "Korea sets new record for foreign tourist arrivals",
+        "link": "https://www.koreaherald.com/article/10916624"
+      }
+    },
+    {
+      "level": 3,
+      "level_label": "Easy · 쉬움",
+      "bonus": false,
+      "category": "Sports",
+      "region": "korean",
+      "question_en": "Which team won its first World Series championship?",
+      "question_ko": "어느 팀이 구단 역사상 처음으로 월드시리즈 우승을 차지했나요?",
+      "options": [
+        {
+          "en": "Milwaukee Brewers",
+          "ko": "밀워키 브루어스"
+        },
+        {
+          "en": "Tampa Bay Rays",
+          "ko": "탬파베이 레이스"
+        },
+        {
+          "en": "Los Angeles Dodgers",
+          "ko": "로스앤젤레스 다저스"
+        },
+        {
+          "en": "Chicago Cubs",
+          "ko": "시카고 컵스"
+        }
+      ],
+      "answer": 0,
+      "why_en": "The Milwaukee Brewers beat the Tampa Bay Rays to win their first World Series.",
+      "why_kr": "밀워키 브루어스가 탬파베이 레이스를 꺾고 첫 월드시리즈 우승을 차지했습니다.",
+      "remark": {
+        "en": "A solid swing! The next one is waiting in the dugout.",
+        "kr": "멋진 한 방이에요! 다음 문제가 대기석에서 기다리고 있어요."
+      },
+      "source": {
+        "title": "Brewers win first World Series of franchise",
+        "link": "https://www.koreaherald.com/article/10919085"
+      }
+    },
+    {
+      "level": 4,
+      "level_label": "Medium · 보통",
+      "bonus": false,
+      "category": "Entertainment",
+      "region": "korean",
+      "question_en": "Where will Boynextdoor begin its first North American tour?",
+      "question_ko": "보이넥스트도어는 첫 북미 투어를 어디에서 시작하나요?",
+      "options": [
+        {
+          "en": "Dallas",
+          "ko": "댈러스"
+        },
+        {
+          "en": "Toronto",
+          "ko": "토론토"
+        },
+        {
+          "en": "New York",
+          "ko": "뉴욕"
+        },
+        {
+          "en": "Mexico City",
+          "ko": "멕시코시티"
+        }
+      ],
+      "answer": 0,
+      "why_en": "The group’s first North American tour opens with a concert in Dallas.",
+      "why_kr": "이 그룹의 첫 북미 투어는 댈러스 공연으로 시작됩니다.",
+      "remark": {
+        "en": "You’re cruising—no need to call for a commercial break.",
+        "kr": "순항 중이네요. 광고 휴식은 아직 필요 없겠어요."
+      },
+      "source": {
+        "title": "Boynextdoor to launch 1st N. American tour",
+        "link": "https://www.koreaherald.com/article/10920708"
+      }
+    },
+    {
+      "level": 5,
+      "level_label": "Medium · 보통",
+      "bonus": false,
+      "category": "Business & Economy",
+      "region": "korean",
+      "question_en": "How much did HD Hyundai Robotics reduce its average robot problem-solving time?",
+      "question_ko": "HD현대 로보틱스는 로봇 문제 해결에 걸리는 평균 시간을 얼마나 줄였나요?",
+      "options": [
+        {
+          "en": "From 21.5 days to 7.9 days",
+          "ko": "21.5일에서 7.9일로"
+        },
+        {
+          "en": "From 14 days to 5 days",
+          "ko": "14일에서 5일로"
+        },
+        {
+          "en": "From 30 days to 10 days",
+          "ko": "30일에서 10일로"
+        },
+        {
+          "en": "From 7.9 days to 21.5 days",
+          "ko": "7.9일에서 21.5일로"
+        }
+      ],
+      "answer": 0,
+      "why_en": "The AI agents reduced the average problem-solving time from 21.5 days to 7.9 days.",
+      "why_kr": "AI 에이전트는 평균 문제 해결 시간을 21.5일에서 7.9일로 줄였습니다.",
+      "remark": {
+        "en": "Sharp work! Your headline instincts deserve a tiny trophy.",
+        "kr": "날카로운 풀이예요! 헤드라인 감각에 작은 트로피를 드릴게요."
+      },
+      "source": {
+        "title": "HD Hyundai Robotics cuts troubleshooting time 63% with Palantir AI",
+        "link": "https://www.koreaherald.com/article/10921723"
+      }
+    },
+    {
+      "level": 6,
+      "level_label": "Hard · 어려움",
+      "bonus": false,
+      "category": "Culture",
+      "region": "korean",
+      "question_en": "What programming method did the creator use to build the virtual temple Sansa?",
+      "question_ko": "온라인 사찰 산사를 만든 제작자는 어떤 프로그래밍 방식을 사용했나요?",
+      "options": [
+        {
+          "en": "Traditional hand coding",
+          "ko": "전통적인 수기 코딩"
+        },
+        {
+          "en": "Vibe coding",
+          "ko": "바이브 코딩"
+        },
+        {
+          "en": "Quantum coding",
+          "ko": "양자 코딩"
+        },
+        {
+          "en": "Crowd coding",
+          "ko": "크라우드 코딩"
+        }
+      ],
+      "answer": 1,
+      "why_en": "The 26-year-old creator built Sansa using vibe coding, an AI-assisted programming method.",
+      "why_kr": "26세의 제작자는 AI 보조 프로그래밍 방식인 바이브 코딩으로 산사를 만들었습니다.",
+      "remark": {
+        "en": "The difficulty is climbing, but so are your bragging rights.",
+        "kr": "난이도는 오르지만, 자랑할 거리도 함께 늘고 있어요."
+      },
+      "source": {
+        "title": "Finding peace, one click at a time: AI-made virtual sanctuaries draw young Koreans",
+        "link": "https://www.koreaherald.com/article/10921693"
+      }
+    },
+    {
+      "level": 7,
+      "level_label": "Hard · 어려움",
+      "bonus": false,
+      "category": "World",
+      "region": "global",
+      "question_en": "How did the Federal Open Market Committee vote on interest rates?",
+      "question_ko": "연방공개시장위원회는 금리 결정에서 어떻게 표결했나요?",
+      "options": [
+        {
+          "en": "12-0 to raise rates",
+          "ko": "12 대 0으로 금리 인상"
+        },
+        {
+          "en": "10-2 to cut rates",
+          "ko": "10 대 2로 금리 인하"
+        },
+        {
+          "en": "10-2 to hold rates steady",
+          "ko": "10 대 2로 금리 동결"
+        },
+        {
+          "en": "8-4 to hold rates steady",
+          "ko": "8 대 4로 금리 동결"
+        }
+      ],
+      "answer": 2,
+      "why_en": "The committee voted 10-2 to keep the target range at 3.75 to 4.00 percent.",
+      "why_kr": "위원회는 목표 금리 범위를 3.75~4.00%로 유지하기로 10 대 2로 표결했습니다.",
+      "remark": {
+        "en": "One final boss remains—bring your best newsroom energy.",
+        "kr": "최종 보스 하나가 남았어요. 뉴스룸 에너지를 최고로 끌어올려 보세요."
+      },
+      "source": {
+        "title": "U.S. Fed holds interest rates steady despite surging inflation",
+        "link": "https://www.thehindu.com/business/Economy/federal-reserve-likely-to-skip-rate-hike-despite-elevated-inflation/article71634402.ece"
+      }
+    },
+    {
+      "level": 8,
+      "level_label": "Bonus · 보너스",
+      "bonus": true,
+      "category": "Business & Economy",
+      "region": "korean",
+      "question_en": "What share of Europe's battery cell production capacity do Korean manufacturers' bases in Poland and Hungary account for?",
+      "question_ko": "폴란드와 헝가리에 있는 한국 배터리 제조업체 생산기지는 유럽 배터리 셀 생산능력의 어느 정도를 차지하나요?",
+      "options": [
+        {
+          "en": "About one-quarter",
+          "ko": "약 4분의 1"
+        },
+        {
+          "en": "About one-half",
+          "ko": "약 절반"
+        },
+        {
+          "en": "About two-thirds",
+          "ko": "약 3분의 2"
+        },
+        {
+          "en": "Roughly three-quarters",
+          "ko": "약 4분의 3"
+        }
+      ],
+      "answer": 3,
+      "why_en": "The article says the production bases account for roughly three-quarters of Europe’s battery cell production capacity.",
+      "why_kr": "기사에 따르면 해당 생산기지들은 유럽 배터리 셀 생산능력의 약 4분의 3을 차지합니다.",
+      "remark": null,
+      "source": {
+        "title": "[APK 2026] Korean PM urges deeper high-tech ties with Germany in AI, chips",
+        "link": "https://www.koreaherald.com/article/10921704"
+      }
+    }
+  ],
+  "media": {
+    "video": "https://github.com/angeldeevena-jpg/maeil-news-v2/releases/download/media-2026-11-01/quiz-2026-W44-video.mp4",
+    "cards": [
+      "https://github.com/angeldeevena-jpg/maeil-news-v2/releases/download/media-2026-11-01/quiz-2026-W44-card-1.png",
+      "https://github.com/angeldeevena-jpg/maeil-news-v2/releases/download/media-2026-11-01/quiz-2026-W44-card-2.png",
+      "https://github.com/angeldeevena-jpg/maeil-news-v2/releases/download/media-2026-11-01/quiz-2026-W44-card-3.png",
+      "https://github.com/angeldeevena-jpg/maeil-news-v2/releases/download/media-2026-11-01/quiz-2026-W44-card-4.png"
+    ]
+  }
+}
